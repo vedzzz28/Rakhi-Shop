@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rakhi Collection by Ruchi Rathi - Designer Rakhis for Raksha Bandhan</title>
+    <meta name="description" content="Beautiful handcrafted designer rakhis by Ruchi Rathi. Premium silver rakhis, kids rakhis, and traditional designs for Raksha Bandhan celebration.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Enhanced Animations and Visual Effects */
+        
+        /* Loading Animation */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: all 0.5s ease;
+        }
+
+        .page-loader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loader-logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+            background: linear-gradient(45deg, #fff, #f093fb, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Enhanced Hero with Dynamic Background */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animated Mesh Background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: meshMove 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes meshMove {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Geometric Shapes Animation */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%);
+            background-size: 60px 60px;
+            animation: geometricMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes geometricMove {
+            0% { background-position: 0 0, 0 0; }
+            100% { background-position: 60px 60px, -60px 60px; }
+        }
+
+        /* Enhanced Page Loader Text */
+        .loader-content p {
+            color: #ffffff;
+            font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        }
+        .hero-content {
+            animation: heroReveal 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) 0.3s both;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes heroReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(100px) scale(0.9);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .hero-title {
+            animation: titleReveal 2s cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s both;
+            position: relative;
+            background: linear-gradient(45deg, #fff, #f093fb, #fff, #4facfe);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleReveal 2s ease 0.5s both, textShimmer 3s ease-in-out infinite 2s;
+        }
+
+        @keyframes titleReveal {
+            0% {
+                opacity: 0;
+                transform: translateX(-100px) rotateY(90deg);
+                filter: blur(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) rotateY(0deg);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes textShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #f093fb, #4facfe, #f093fb);
+            border-radius: 3px;
+            animation: underlineExpand 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) 1.5s both;
+            box-shadow: 0 0 20px rgba(240,147,251,0.5);
+        }
+
+        @keyframes underlineExpand {
+            to { width: 200px; }
+        }
+
+        .hero-subtitle {
+            animation: slideInRight 1s ease 0.7s both;
+        }
+
+        .hero-features {
+            animation: fadeInUp 1s ease 0.9s both;
+        }
+
+        .feature {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .feature:nth-child(1) { animation-delay: 1.1s; }
+        .feature:nth-child(2) { animation-delay: 1.3s; }
+        .feature:nth-child(3) { animation-delay: 1.5s; }
+
+        .cta-button {
+            animation: fadeInUp 1s ease 1.7s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Enhanced Hero Image */
+        .hero-image {
+            animation: slideInRight 1s ease 0.5s both;
+        }
+
+        .hero-img {
+            animation: floatImage 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
+        }
+
+        @keyframes floatImage {
+            0%, 100% { transform: rotate(5deg) translateY(0px); }
+            50% { transform: rotate(5deg) translateY(-20px); }
+        }
+
+        /* Enhanced Floating Elements */
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .float-item {
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.9;
+            animation: floatAndGlow 12s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.8));
+            transition: all 0.3s ease;
+        }
+
+        .float-1 {
+            top: 15%;
+            left: 8%;
+            animation-delay: 0s;
+            color: #f093fb;
+            font-size: 3.5rem;
+        }
+
+        .float-2 {
+            top: 65%;
+            right: 12%;
+            animation-delay: 3s;
+            color: #4facfe;
+            font-size: 2.8rem;
+        }
+
+        .float-3 {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 6s;
+            color: #f5576c;
+            font-size: 3.2rem;
+        }
+
+        .float-4 {
+            top: 35%;
+            right: 25%;
+            animation-delay: 9s;
+            color: #667eea;
+            font-size: 2.5rem;
+        }
+
+        .float-5 {
+            top: 50%;
+            left: 50%;
+            animation-delay: 4.5s;
+            color: #f093fb;
+            font-size: 2rem;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes floatAndGlow {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1);
+                filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px rgba(255,255,255,0.4));
+            }
+            25% { 
+                transform: translateY(-40px) rotate(15deg) scale(1.2);
+                filter: drop-shadow(0 0 30px currentColor) drop-shadow(0 0 60px rgba(255,255,255,0.6));
+            }
+            50% { 
+                transform: translateY(-20px) rotate(-10deg) scale(1.1);
+                filter: drop-shadow(0 0 35px currentColor) drop-shadow(0 0 50px rgba(255,255,255,0.5));
+            }
+            75% { 
+                transform: translateY(-35px) rotate(8deg) scale(1.15);
+                filter: drop-shadow(0 0 25px currentColor) drop-shadow(0 0 45px rgba(255,255,255,0.4));
+            }
+        }
+
+        /* Enhanced Mandalas */
+        .mandala {
+            position: absolute;
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #f093fb, #4facfe, #f5576c, #667eea, #f093fb) 1;
+            border-radius: 50%;
+            opacity: 0.7;
+            background: radial-gradient(circle, rgba(240,147,251,0.1), transparent 70%);
+        }
+
+        .mandala-1 {
+            width: 400px;
+            height: 400px;
+            top: 5%;
+            right: 2%;
+            animation: rotateAndPulse 30s linear infinite, mandalaBreathe 8s ease-in-out infinite;
+        }
+
+        .mandala-2 {
+            width: 250px;
+            height: 250px;
+            bottom: 10%;
+            left: -5%;
+            animation: rotateAndPulse 25s linear infinite reverse, mandalaBreathe 6s ease-in-out infinite 2s;
+        }
+
+        .mandala-3 {
+            width: 180px;
+            height: 180px;
+            top: 45%;
+            left: 45%;
+            transform: translate(-50%, -50%);
+            animation: rotateAndPulse 35s linear infinite, mandalaBreathe 10s ease-in-out infinite 1s;
+        }
+
+        @keyframes rotateAndPulse {
+            0% { 
+                transform: rotate(0deg) scale(1);
+                opacity: 0.7;
+                filter: drop-shadow(0 0 20px rgba(240,147,251,0.5));
+            }
+            50% { 
+                transform: rotate(180deg) scale(1.15);
+                opacity: 0.9;
+                filter: drop-shadow(0 0 40px rgba(79,172,254,0.8));
+            }
+            100% { 
+                transform: rotate(360deg) scale(1);
+                opacity: 0.7;
+                filter: drop-shadow(0 0 20px rgba(245,87,108,0.5));
+            }
+        }
+
+        @keyframes mandalaBreathe {
+            0%, 100% { 
+                background: radial-gradient(circle, rgba(240,147,251,0.1), transparent 70%);
+            }
+            50% { 
+                background: radial-gradient(circle, rgba(79,172,254,0.2), transparent 70%);
+            }
+        }
+
+        /* Enhanced Particle System */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: particleFloat 20s linear infinite;
+            background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(240,147,251,0.4), transparent);
+            box-shadow: 0 0 10px rgba(255,255,255,0.6);
+        }
+
+        .particle.large {
+            width: 8px;
+            height: 8px;
+        }
+
+        .particle.medium {
+            width: 6px;
+            height: 6px;
+        }
+
+        .particle.small {
+            width: 4px;
+            height: 4px;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0px) rotate(0deg) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) translateX(20px) rotate(45deg) scale(1);
+            }
+            90% {
+                opacity: 0.8;
+                transform: translateY(10vh) translateX(-20px) rotate(315deg) scale(1.2);
+            }
+            100% {
+                transform: translateY(-10vh) translateX(0px) rotate(360deg) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Scroll-triggered animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Enhanced Category Cards */
+        .category-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: 1;
+        }
+
+        .category-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .category-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .category-image img {
+            transition: transform 0.5s ease;
+        }
+
+        .category-card:hover .category-image img {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .category-overlay {
+            transition: all 0.5s ease;
+        }
+
+        .category-card:hover .category-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(220,38,38,0.8));
+        }
+
+        /* Enhanced Feature Cards */
+        .feature-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(220,38,38,0.05), rgba(245,158,11,0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(220,38,38,0.15);
+        }
+
+        .feature-icon {
+            transition: all 0.5s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: scale(1.1) translateY(0); }
+            40% { transform: scale(1.1) translateY(-10px); }
+            80% { transform: scale(1.1) translateY(-5px); }
+        }
+
+        /* Enhanced Button Animations */
+        .enhanced-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .enhanced-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+
+        .enhanced-button:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* MOBILE SLIDER FOR CATEGORIES */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        /* Mobile Slider Styles */
+        @media (max-width: 768px) {
+            .categories-grid {
+                display: none;
+            }
+            
+            .mobile-categories-slider {
+                display: block;
+                position: relative;
+                overflow: hidden;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+            
+            .slider-container {
+                display: flex;
+                transition: transform 0.3s ease;
+                width: calc(100% * 7); /* 7 categories */
+            }
+            
+            .slider-item {
+                width: calc(100% / 7);
+                flex-shrink: 0;
+                padding: 0 5px;
+            }
+            
+            .slider-item .category-card {
+                height: 300px;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                transition: transform 0.3s ease;
+            }
+            
+            .slider-item .category-card:hover {
+                transform: translateY(-5px);
+            }
+            
+            .slider-item .category-image {
+                height: 200px;
+            }
+            
+            .slider-item .category-overlay {
+                padding: 20px;
+            }
+            
+            .slider-item .category-overlay h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+            
+            .slider-item .category-overlay p {
+                font-size: 0.85rem;
+                margin-bottom: 15px;
+            }
+            
+            .slider-item .category-link {
+                padding: 6px 16px;
+                font-size: 0.85rem;
+            }
+            
+            /* Slider Navigation */
+            .slider-nav {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(255, 255, 255, 0.9);
+                border: none;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 10;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            
+            .slider-nav:hover {
+                background: white;
+                transform: translateY(-50%) scale(1.1);
+            }
+            
+            .slider-nav.prev {
+                left: 10px;
+            }
+            
+            .slider-nav.next {
+                right: 10px;
+            }
+            
+            .slider-nav i {
+                color: #dc2626;
+                font-size: 1.1rem;
+            }
+            
+            /* Slider Dots */
+            .slider-dots {
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                margin-top: 20px;
+            }
+            
+            .slider-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: rgba(220, 38, 38, 0.3);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            
+            .slider-dot.active {
+                background: #dc2626;
+                transform: scale(1.2);
+            }
+            
+            /* Mobile Category Cards Compact */
+            .mobile-categories-slider .category-card {
+                margin: 0;
+            }
+            
+            .mobile-categories-slider .category-image {
+                height: 180px;
+            }
+            
+            .mobile-categories-slider .category-overlay {
+                padding: 15px;
+            }
+            
+            .mobile-categories-slider .category-overlay h3 {
+                font-size: 1rem;
+                margin-bottom: 6px;
+            }
+            
+            .mobile-categories-slider .category-overlay p {
+                font-size: 0.8rem;
+                margin-bottom: 12px;
+                line-height: 1.3;
+            }
+            
+            .mobile-categories-slider .category-link {
+                padding: 5px 14px;
+                font-size: 0.8rem;
+                border-radius: 15px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-categories-slider {
+                display: none;
+            }
+        }
+
+        /* Responsive Enhancements */
+        @media (max-width: 768px) {
+            .loader-logo {
+                font-size: 2rem;
+            }
+            
+            .float-item {
+                font-size: 1.8rem;
+            }
+            
+            .mandala-1 {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .mandala-2 {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .hero-title {
+                font-size: 2.2rem;
+                text-shadow: 0 3px 15px rgba(0,0,0,0.6), 0 0 30px rgba(255,255,255,0.3);
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+                text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+            }
+            
+            .feature {
+                background: rgba(255,255,255,0.2);
+                border: 2px solid rgba(255,255,255,0.4);
+                padding: 10px 16px;
+            }
+            
+            .feature span {
+                font-size: 0.9rem;
+                font-weight: 700;
+            }
+            
+            .cta-button {
+                font-size: 1rem;
+                padding: 14px 28px;
+                text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            }
+        }
+
+        /* Custom Keyframes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(to right, #dc2626, #f59e0b);
+            z-index: 1001;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <div class="loader-logo">Rakhi Collection</div>
+            <div class="loader-spinner"></div>
+            <p>Loading beautiful memories...</p>
+        </div>
+    </div>
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Rakhi Collection</h2>
+                <span>by Ruchi Rathi</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="shop.html" class="nav-link">Shop</a></li>
+                <li><a href="cart.html" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart <span class="cart-count">0</span>
+                </a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Particle Effects -->
+        <div class="particles" id="particles"></div>
+        
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Celebrate the Sacred Bond
+                    <span class="highlight">Raksha Bandhan</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Explore a thoughtfully curated collection of designer, traditional, and festive rakhis — sourced with love to make every sibling smile.
+                </p>
+                <a href="shop.html" class="cta-button enhanced-button">
+                    <span>Shop Now</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="hero-image">
+                <div class="floating-elements">
+                    <div class="float-item float-1">🎀</div>
+                    <div class="float-item float-2">✨</div>
+                    <div class="float-item float-3">🌟</div>
+                    <div class="float-item float-4">💝</div>
+                    <div class="float-item float-5">🎊</div>
+                </div>
+                <img src="assets/images/hero.jpeg" alt="Beautiful Rakhi Collection" class="hero-img">
+            </div>
+        </div>
+        <div class="hero-decoration">
+            <div class="mandala mandala-1"></div>
+            <div class="mandala mandala-2"></div>
+            <div class="mandala mandala-3"></div>
+        </div>
+    </section>
+
+    <!-- Categories Preview -->
+    <section class="categories-preview">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>Our Premium Collections</h2>
+                <p>Discover rakhis that match every bond and every style</p>
+            </div>
+            
+            <!-- Desktop Grid -->
+            <div class="categories-grid">
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/thread-bg.jpg" alt="Thread Rakhis">
+                        <div class="category-overlay">
+                            <h3>Thread Rakhis</h3>
+                            <p>Graceful, timeless threads that honor tradition</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('thread')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/Single-bg.jpg" alt="Designer Rakhis">
+                        <div class="category-overlay">
+                            <h3>Designer Rakhis</h3>
+                            <p>Elegance in Every Thread — Make it memorable</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('designer')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/lumba-bg.jpg" alt="Lumba Rakhis">
+                        <div class="category-overlay">
+                            <h3>Lumba Rakhis</h3>
+                            <p>Celebrate your bond with Bhabhi in style</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('lumba')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/Silver-bg.jpg" alt="Silver Rakhis">
+                        <div class="category-overlay">
+                            <h3>Silver Rakhis</h3>
+                            <p>Pure Silver – A Gift of Lasting Value</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('silver')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/Kids-bg.jpg" alt="Kids Rakhis">
+                        <div class="category-overlay">
+                            <h3>Kids Rakhis</h3>
+                            <p>Fun & Festive Designs for Little Ones</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('kids')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/pair-bg.jpg" alt="Bhaiya Bhabhi Rakhis">
+                        <div class="category-overlay">
+                            <h3>Bhaiya-Bhabhi Pair</h3>
+                            <p>Celebrate the Couple's Bond with Love</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('bhaiya-bhabhi')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-card animate-on-scroll">
+                    <div class="category-image">
+                        <img src="assets/images/kc-bg.jpg" alt="Kumkum Chawal Sets">
+                        <div class="category-overlay">
+                            <h3>Kumkum Chawal Sets</h3>
+                            <p>Traditional Essentials for Sacred Rituals</p>
+                            <a href="javascript:void(0)" class="category-link enhanced-button" onclick="navigateToCategory('kumkum-chawal')">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Slider -->
+            <div class="mobile-categories-slider">
+                <div class="slider-container" id="sliderContainer">
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/thread-bg.jpg" alt="Thread Rakhis">
+                                <div class="category-overlay">
+                                    <h3>Thread Rakhis</h3>
+                                    <p>Graceful, timeless threads that honor tradition</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('thread')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/Single-bg.jpg" alt="Designer Rakhis">
+                                <div class="category-overlay">
+                                    <h3>Designer Rakhis</h3>
+                                    <p>Elegance in Every Thread — Make it memorable</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('designer')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/lumba-bg.jpg" alt="Lumba Rakhis">
+                                <div class="category-overlay">
+                                    <h3>Lumba Rakhis</h3>
+                                    <p>Celebrate your bond with Bhabhi in style</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('lumba')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/Silver-bg.jpg" alt="Silver Rakhis">
+                                <div class="category-overlay">
+                                    <h3>Silver Rakhis</h3>
+                                    <p>Pure Silver – A Gift of Lasting Value</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('silver')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/Kids-bg.jpg" alt="Kids Rakhis">
+                                <div class="category-overlay">
+                                    <h3>Kids Rakhis</h3>
+                                    <p>Fun & Festive Designs for Little Ones</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('kids')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/pair-bg.jpg" alt="Bhaiya Bhabhi Rakhis">
+                                <div class="category-overlay">
+                                    <h3>Bhaiya-Bhabhi Pair</h3>
+                                    <p>Celebrate the Couple's Bond with Love</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('bhaiya-bhabhi')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-item">
+                        <div class="category-card">
+                            <div class="category-image">
+                                <img src="assets/images/kc-bg.jpg" alt="Kumkum Chawal Sets">
+                                <div class="category-overlay">
+                                    <h3>Kumkum Chawal Sets</h3>
+                                    <p>Traditional Essentials for Sacred Rituals</p>
+                                    <a href="javascript:void(0)" class="category-link" onclick="navigateToCategory('kumkum-chawal')">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Slider Dots -->
+                <div class="slider-dots">
+                    <div class="slider-dot active" onclick="goToSlide(0)"></div>
+                    <div class="slider-dot" onclick="goToSlide(1)"></div>
+                    <div class="slider-dot" onclick="goToSlide(2)"></div>
+                    <div class="slider-dot" onclick="goToSlide(3)"></div>
+                    <div class="slider-dot" onclick="goToSlide(4)"></div>
+                    <div class="slider-dot" onclick="goToSlide(5)"></div>
+                    <div class="slider-dot" onclick="goToSlide(6)"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="why-choose-us">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <h2>Why Choose Our Rakhis?</h2>
+                <p>Celebrate Raksha Bandhan with trust, elegance, and handpicked Rakhi collections your loved ones will adore.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3>Curated Premium Selection</h3>
+                    <p>We bring you the finest rakhis from trusted artisans and brands — so you can shop confidently for quality and variety.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <h3>Affordable Festive Pricing</h3>
+                    <p>Celebrate with beautiful rakhis for every budget — from designer to traditional — without compromising on elegance.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h3>Perfect Gifts for Every Bond</h3>
+                    <p>Whether it's for your little brother or beloved Bhaiya-Bhabhi, find the perfect Rakhi gift to express your love this festive season.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Rakhi Collection by Ruchi Rathi</h3>
+                    <p>Your trusted destination for beautifully curated rakhis — handpicked with love to make your Raksha Bandhan truly memorable.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="shop.html">Shop All Rakhis</a></li>
+                        <li><a href="cart.html">My Cart</a></li>
+                        <li><a href="checkout.html">Checkout</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>A-31, Umed Club Road, Raika Bagh, Jodhpur, Rajasthan</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <a href="tel:+919460250677">+91 9460250677</a><br>
+                                <a href="tel:+918949409523">+91 8949409523</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Rakhi Collection by Ruchi Rathi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script>
+        // Mobile Categories Slider Logic
+        let currentSlide = 0;
+        const totalSlides = 7;
+        let isAutoPlaying = true;
+        let autoPlayInterval;
+
+        function moveSlider(direction) {
+            const container = document.getElementById('sliderContainer');
+            const dots = document.querySelectorAll('.slider-dot');
+            
+            // Remove active class from current dot
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide += direction;
+            
+            // Handle wrap around
+            if (currentSlide >= totalSlides) {
+                currentSlide = 0;
+            } else if (currentSlide < 0) {
+                currentSlide = totalSlides - 1;
+            }
+            
+            // Move slider
+            const translateX = -(currentSlide * (100 / totalSlides));
+            container.style.transform = `translateX(${translateX}%)`;
+            
+            // Add active class to new dot
+            dots[currentSlide].classList.add('active');
+            
+           
+        }
+
+        function goToSlide(slideIndex) {
+            const container = document.getElementById('sliderContainer');
+            const dots = document.querySelectorAll('.slider-dot');
+            
+            // Remove active class from current dot
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = slideIndex;
+            
+            // Move slider
+            const translateX = -(currentSlide * (100 / totalSlides));
+            container.style.transform = `translateX(${translateX}%)`;
+            
+            // Add active class to new dot
+            dots[currentSlide].classList.add('active');
+            
+            
+        }
+
+       autoPlayInterval = setInterval(() => {
+            if (isAutoPlaying) {
+                moveSlider(1); // Move to next slide
+            }
+        }, 3000); // Change slide every 3 seconds
+
+        // Touch/Swipe support for mobile
+        let startX = 0;
+        let endX = 0;
+
+        function handleTouchStart(e) {
+            startX = e.touches[0].clientX;
+        }
+
+        function handleTouchEnd(e) {
+            endX = e.changedTouches[0].clientX;
+            const deltaX = startX - endX;
+            
+            if (Math.abs(deltaX) > 50) { // Minimum swipe distance
+                if (deltaX > 0) {
+                    moveSlider(1); // Swipe left - next slide
+                } else {
+                    moveSlider(-1); // Swipe right - previous slide
+                }
+            }
+        }
+
+        // ===== NAVIGATE TO CATEGORY WITH FILTER =====
+        function navigateToCategory(category) {
+            // Store the selected category in localStorage for the shop page to read
+            localStorage.setItem('selectedCategory', category);
+            // Navigate to shop page
+            window.location.href = 'shop.html';
+        }
+
+        // Enhanced JavaScript for animations and cursor trail
+        document.addEventListener('DOMContentLoaded', function() {
+            // Page Loader
+            const pageLoader = document.getElementById('pageLoader');
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    pageLoader.classList.add('fade-out');
+                }, 1500);
+            });
+
+            // Scroll Progress Bar
+            const scrollProgress = document.getElementById('scrollProgress');
+            window.addEventListener('scroll', function() {
+                const scrolled = (window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                scrollProgress.style.width = scrolled + '%';
+            });
+
+            // Enhanced Particle System
+            function createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                if (!particlesContainer) return;
+
+                // Clear existing particles
+                particlesContainer.innerHTML = '';
+
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    const size = Math.random() > 0.7 ? 'large' : Math.random() > 0.4 ? 'medium' : 'small';
+                    particle.className = `particle ${size}`;
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 20 + 's';
+                    particle.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                    
+                    // Random colors
+                    const colors = [
+                        'radial-gradient(circle, rgba(240,147,251,0.9), rgba(240,147,251,0.3), transparent)',
+                        'radial-gradient(circle, rgba(79,172,254,0.9), rgba(79,172,254,0.3), transparent)',
+                        'radial-gradient(circle, rgba(245,87,108,0.9), rgba(245,87,108,0.3), transparent)',
+                        'radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0.3), transparent)'
+                    ];
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            createParticles();
+
+            // Enhanced scroll-triggered animations
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -80px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.animate-on-scroll').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Mobile Slider Setup
+            const slider = document.querySelector('.mobile-categories-slider');
+            if (slider && window.innerWidth <= 768) {
+                const container = slider.querySelector('.slider-container');
+                
+                // Add touch events
+                container.addEventListener('touchstart', handleTouchStart, { passive: true });
+                container.addEventListener('touchend', handleTouchEnd, { passive: true });
+                
+                // Start auto-play
+                startAutoPlay();
+                
+                // Pause on hover (for devices that support it)
+                slider.addEventListener('mouseenter', () => {
+                    clearInterval(autoPlayInterval);
+                });
+                
+                slider.addEventListener('mouseleave', () => {
+                    if (isAutoPlaying) {
+                        startAutoPlay();
+                    }
+                });
+            }
+
+            // Enhanced CTA Button Effect with Multiple Ripples
+            document.querySelectorAll('.enhanced-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Create multiple ripples
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const ripple = document.createElement('div');
+                            ripple.style.position = 'absolute';
+                            ripple.style.borderRadius = '50%';
+                            ripple.style.background = i === 0 ? 'rgba(255,255,255,0.8)' : 'rgba(240,147,251,0.6)';
+                            ripple.style.transform = 'scale(0)';
+                            ripple.style.animation = 'ripple 0.8s linear';
+                            ripple.style.left = x + 'px';
+                            ripple.style.top = y + 'px';
+                            ripple.style.width = '20px';
+                            ripple.style.height = '20px';
+                            ripple.style.marginLeft = '-10px';
+                            ripple.style.marginTop = '-10px';
+                            ripple.style.pointerEvents = 'none';
+                            
+                            this.appendChild(ripple);
+                            
+                            setTimeout(() => {
+                                if (ripple.parentNode) {
+                                    ripple.remove();
+                                }
+                            }, 800);
+                        }, i * 100);
+                    }
+                });
+            });
+
+            // Enhanced parallax effect for hero decorations
+            let ticking = false;
+            
+            function updateParallax() {
+                const scrolled = window.pageYOffset;
+                
+                const mandala1 = document.querySelector('.mandala-1');
+                const mandala2 = document.querySelector('.mandala-2');
+                const mandala3 = document.querySelector('.mandala-3');
+                
+                if (mandala1) {
+                    mandala1.style.transform = `translateY(${scrolled * 0.3}px) rotate(${scrolled * 0.1}deg) scale(${1 + scrolled * 0.0005})`;
+                }
+                if (mandala2) {
+                    mandala2.style.transform = `translateY(${scrolled * -0.2}px) rotate(${scrolled * -0.15}deg) scale(${1 + scrolled * 0.0003})`;
+                }
+                if (mandala3) {
+                    mandala3.style.transform = `translate(-50%, -50%) translateY(${scrolled * 0.1}px) rotate(${scrolled * 0.05}deg)`;
+                }
+                
+                ticking = false;
+            }
+            
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateParallax);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', requestTick);
+
+            // Add enhanced ripple animation CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(6);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Recreation of particles every 30 seconds for variety
+            setInterval(createParticles, 30000);
+
+            // Handle window resize for slider
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    if (!isAutoPlaying) {
+                        isAutoPlaying = true;
+                        startAutoPlay();
+                    }
+                } else {
+                    stopAutoPlay();
+                }
+            });
+        });
+
+        // Export slider functions to global scope
+        window.moveSlider = moveSlider;
+        window.goToSlide = goToSlide;
+        window.navigateToCategory = navigateToCategory;
+    </script>
+</body>
+</html>

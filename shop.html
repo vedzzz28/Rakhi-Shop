@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Designer Rakhis - Rakhi Collection by Ruchi Rathi</title>
+    <meta name="description" content="Browse our complete collection of handcrafted designer rakhis. Filter by category, price range and find the perfect rakhi for your brother.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Enhanced Quick View Modal & Mobile Styles -->
+    <style>
+        /* Enhanced Quick View Modal Styles */
+        .quick-view-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2500;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .quick-view-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-view-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 900px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes slideInScale {
+            from {
+                transform: scale(0.7) translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .quick-view-header {
+            position: relative;
+            padding: 0;
+        }
+
+        .quick-view-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #333;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-view-close:hover {
+            background: white;
+            transform: scale(1.1) rotate(90deg);
+            color: var(--primary-red);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-view-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 400px;
+        }
+
+        .quick-view-image {
+            position: relative;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px 0 0 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-view-image img {
+            width: 100%;
+            height: 450px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .quick-view-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .quick-view-details {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .quick-view-category {
+            color: var(--primary-red);
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .quick-view-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-gray);
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .quick-view-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 25px;
+        }
+
+        .quick-view-stock {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stock-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stock-status.in-stock {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .stock-status.low-stock {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .stock-status.out-of-stock {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .cart-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .quick-view-description {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 5px solid var(--primary-red);
+        }
+
+        .quick-view-description p {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .quick-view-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .quick-view-quantity {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .quantity-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 10px 15px;
+            background: white;
+        }
+
+        .qty-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .qty-btn:hover:not(:disabled) {
+            background: var(--primary-red);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .qty-btn:disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .qty-input {
+            width: 70px;
+            text-align: center;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+            background: transparent;
+        }
+
+        .add-to-cart-large {
+            background: linear-gradient(135deg, var(--primary-red), var(--primary-gold));
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+        }
+
+        .add-to-cart-large:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(220, 38, 38, 0.4);
+        }
+
+        .add-to-cart-large:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Enhanced Product Card Eye Icon */
+        .quick-view-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-red);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0.8);
+            z-index: 5;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card:hover .quick-view-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .quick-view-btn:hover {
+            background: var(--primary-red);
+            color: white;
+            transform: scale(1.2);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        /* Enhanced Product Quantity Controls */
+        .product-quantity-controls {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border: 2px solid var(--light-gold);
+        }
+
+        .product-quantity-controls.show {
+            display: flex;
+        }
+
+        .product-qty-btn {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--primary-red);
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-red);
+        }
+
+        .product-qty-btn:hover:not(:disabled) {
+            background: var(--primary-red);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .product-qty-btn:disabled {
+            border-color: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .product-qty-display {
+            font-weight: 700;
+            color: var(--dark-gray);
+            min-width: 35px;
+            text-align: center;
+            font-size: 1.1rem;
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 2px solid var(--light-gold);
+        }
+
+        /* Mobile Responsive Enhancements */
+        @media (max-width: 768px) {
+            .quick-view-content {
+                width: 98%;
+                margin: 10px;
+                max-height: 95vh;
+            }
+            
+            .quick-view-body {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-view-image {
+                border-radius: 20px 20px 0 0;
+            }
+            
+            .quick-view-image img {
+                height: 300px;
+            }
+            
+            .quick-view-details {
+                padding: 25px;
+            }
+            
+            .quick-view-title {
+                font-size: 1.6rem;
+            }
+            
+            .quick-view-price {
+                font-size: 2rem;
+            }
+            
+            .quick-view-close {
+                top: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .quick-view-quantity {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .quantity-selector {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .add-to-cart-large {
+                padding: 15px 25px;
+                font-size: 1.1rem;
+            }
+            
+            /* Mobile Product Grid - 2 columns */
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px !important;
+            }
+            
+            .product-card {
+                min-width: 0;
+            }
+            
+            .product-card .product-info {
+                padding: 15px;
+            }
+            
+            .product-card .product-title {
+                font-size: 0.95rem;
+                line-height: 1.3;
+                margin-bottom: 8px;
+            }
+            
+            .product-card .product-price {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+            
+            .product-card .add-to-cart-btn {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+                gap: 6px;
+            }
+            
+            .product-quantity-controls {
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            .product-qty-btn {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .product-qty-display {
+                min-width: 30px;
+                font-size: 1rem;
+                padding: 4px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quick-view-details {
+                padding: 20px;
+            }
+            
+            .quick-view-title {
+                font-size: 1.4rem;
+            }
+            
+            .quick-view-price {
+                font-size: 1.8rem;
+            }
+            
+            .products-grid {
+                gap: 12px !important;
+            }
+            
+            .product-card .product-info {
+                padding: 12px;
+            }
+        }
+
+        /* Enhanced Mobile Filter Toggle */
+        @media (max-width: 1024px) {
+            .filter-toggle {
+                display: flex !important;
+                background: linear-gradient(135deg, var(--primary-red), var(--primary-gold));
+                color: white;
+                border: none;
+                padding: 15px 25px;
+                border-radius: 12px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                gap: 10px;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 25px;
+            }
+            
+            .filter-toggle:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+            }
+        }
+
+        /* Out of Stock Overlay Enhancement */
+        .out-of-stock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            z-index: 3;
+        }
+
+        /* Loading Enhancement */
+        .loading-spinner {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray);
+        }
+
+        .loading-spinner i {
+            font-size: 3.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 25px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-spinner p {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Rakhi Collection</h2>
+                <span>by Ruchi Rathi</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="shop.html" class="nav-link active">Shop</a></li>
+                <li><a href="cart.html" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart <span class="cart-count">0</span>
+                </a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Shop Header -->
+    <section class="shop-header">
+        <div class="container">
+            <h1>Our Rakhi Collection</h1>
+            <p>Discover the perfect rakhi for your beloved brother</p>
+        </div>
+    </section>
+
+    <!-- Shop Content -->
+    <div class="shop-container">
+        <div class="container">
+            <div class="shop-layout">
+                <!-- Desktop Filters Sidebar -->
+                <aside class="filters-sidebar desktop-filters">
+                    <div class="filters-header">
+                        <h3>Filter Rakhis</h3>
+                        <button class="clear-filters" onclick="clearAllFilters()">Clear All</button>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="filter-group">
+                        <h4>Categories</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="all" checked>
+                                <span class="checkmark"></span>
+                                All Rakhis
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="thread">
+                                <span class="checkmark"></span>
+                                Simple Thread Rakhis
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="designer">
+                                <span class="checkmark"></span>
+                                Designer Rakhis
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="lumba">
+                                <span class="checkmark"></span>
+                                Lumba Rakhis
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="silver">
+                                <span class="checkmark"></span>
+                                Silver Rakhis
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="kids">
+                                <span class="checkmark"></span>
+                                Kids Rakhis
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="bhaiya-bhabhi">
+                                <span class="checkmark"></span>
+                                Bhaiya-Bhabhi Pair
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="kumkum-chawal">
+                                <span class="checkmark"></span>
+                                Kumkum-Chawal Sets
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div class="filter-group">
+                        <h4>Price Range</h4>
+                        <div class="price-range">
+                            <div class="price-inputs">
+                                <input type="number" id="minPrice" placeholder="Min" min="0">
+                                <span>to</span>
+                                <input type="number" id="maxPrice" placeholder="Max" min="0">
+                            </div>
+                            <button onclick="applyPriceFilter()" class="apply-price-btn">Apply</button>
+                        </div>
+                        <div class="price-presets">
+                            <button onclick="setPriceRange(0, 50)" class="price-preset">Under ₹50</button>
+                            <button onclick="setPriceRange(50, 100)" class="price-preset">₹50 - ₹100</button>
+                            <button onclick="setPriceRange(100, 200)" class="price-preset">₹100 - ₹200</button>
+                            <button onclick="setPriceRange(200, 1000)" class="price-preset">₹200+</button>
+                        </div>
+                    </div>
+
+                    <!-- Sort Options -->
+                    <div class="filter-group">
+                        <h4>Sort By</h4>
+                        <select id="sortSelect" onchange="sortProducts()">
+                            <option value="name-asc">Name A-Z</option>
+                            <option value="name-desc">Name Z-A</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                        </select>
+                    </div>
+                </aside>
+
+                <!-- Products Grid -->
+                <main class="products-section">
+                    <div class="products-header">
+                        <div class="products-count">
+                            <span id="productCount">Loading products...</span>
+                        </div>
+                        <button class="filter-toggle" onclick="openMobileFilters()">
+                            <i class="fas fa-filter"></i>
+                            Filters & Sort
+                        </button>
+                    </div>
+
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading beautiful rakhis...</p>
+                    </div>
+
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded dynamically here -->
+                    </div>
+
+                    <div class="no-products" id="noProducts" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <h3>No rakhis found</h3>
+                        <p>Try adjusting your filters to see more products</p>
+                        <button onclick="clearAllFilters()" class="cta-button">Clear Filters</button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Quick View Modal -->
+    <div class="quick-view-modal" id="quickViewModal" onclick="closeQuickView()">
+        <div class="quick-view-content" onclick="event.stopPropagation()">
+            <div class="quick-view-header">
+                <button class="quick-view-close" onclick="closeQuickView()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="quick-view-body" id="quickViewBody">
+                <!-- Quick view content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Filters Modal -->
+    <div class="mobile-filters-overlay" id="mobileFiltersOverlay">
+        <div class="mobile-filters-container">
+            <div class="mobile-filter-header">
+                <h3>Filter Rakhis</h3>
+                <button class="close-mobile-filters" onclick="closeMobileFilters()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mobile-filter-content">
+                <!-- Category Section -->
+                <div class="mobile-filter-group">
+                    <button class="mobile-filter-toggle" onclick="toggleMobileFilterGroup('category')">
+                        <span>Category</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="mobile-filter-options" id="mobileCategory">
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="all" checked>
+                            <span class="radio-custom"></span>
+                            <span class="option-text">All Rakhis</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="thread">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Thread Rakhis</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="designer">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Designer Rakhis</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="silver">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Silver Rakhis</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="kids">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Kids Rakhis</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="bhaiya-bhabhi">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Bhaiya-Bhabhi Pair</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="lumba">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Lumba Rakhis</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileCategory" value="kumkum-chawal">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Kumkum-Chawal Sets</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Price Section -->
+                <div class="mobile-filter-group">
+                    <button class="mobile-filter-toggle" onclick="toggleMobileFilterGroup('price')">
+                        <span>Price Range</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="mobile-filter-options" id="mobilePrice">
+                        <div class="mobile-price-inputs">
+                            <input type="number" id="mobileMinPrice" placeholder="Min" min="0">
+                            <span>to</span>
+                            <input type="number" id="mobileMaxPrice" placeholder="Max" min="0">
+                        </div>
+                        <div class="mobile-price-presets">
+                            <button onclick="setMobilePriceRange(0, 100)">Under ₹100</button>
+                            <button onclick="setMobilePriceRange(100, 300)">₹100 - ₹300</button>
+                            <button onclick="setMobilePriceRange(300, 500)">₹300 - ₹500</button>
+                            <button onclick="setMobilePriceRange(500, 1000)">₹500+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sort Section -->
+                <div class="mobile-filter-group">
+                    <button class="mobile-filter-toggle" onclick="toggleMobileFilterGroup('sort')">
+                        <span>Sort By</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="mobile-filter-options" id="mobileSort">
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileSort" value="name-asc" checked>
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Name A-Z</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileSort" value="name-desc">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Name Z-A</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileSort" value="price-asc">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Price: Low to High</span>
+                        </label>
+                        <label class="mobile-filter-option">
+                            <input type="radio" name="mobileSort" value="price-desc">
+                            <span class="radio-custom"></span>
+                            <span class="option-text">Price: High to Low</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mobile-filter-actions">
+                <button onclick="clearAllMobileFilters()" class="mobile-clear-btn">Clear All</button>
+                <button onclick="applyMobileFilters()" class="mobile-apply-btn">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Cart Success Toast -->
+    <div class="toast" id="cartToast">
+        <i class="fas fa-check-circle"></i>
+        <span>Added to cart successfully!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Rakhi Collection by Ruchi Rathi</h3>
+                    <p>Your trusted destination for beautifully curated rakhis — handpicked with love to make your Raksha Bandhan truly memorable.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="shop.html">Shop All Rakhis</a></li>
+                        <li><a href="cart.html">My Cart</a></li>
+                        <li><a href="checkout.html">Checkout</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>A-31, Umed Club Road, Raika Bagh, Jodhpur, Rajasthan</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <a href="tel:+919460250677">+91 9460250677</a><br>
+                                <a href="tel:+918949409523">+91 8949409523</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Rakhi Collection by Ruchi Rathi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/shop.js"></script>
+</body>
+</html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Checkout - Rakhi Collection by Ruchi Rathi</title>
+    <meta name="description" content="Complete your rakhi order with secure checkout. Fast delivery within Jodhpur and across India.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        /* Auto-detection delivery area styles */
+        .delivery-area-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0e7ff);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .delivery-area-info.jodhpur {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-color: #22c55e;
+        }
+
+        .delivery-area-info.outside {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border-color: #f59e0b;
+        }
+
+        .area-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            color: #3b82f6;
+            font-size: 1.2rem;
+        }
+
+        .delivery-area-info.jodhpur .area-icon {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .delivery-area-info.outside .area-icon {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .area-details {
+            flex: 1;
+        }
+
+        .area-details strong {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .area-description {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .area-charge {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        .pincode-note {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Enhanced form styles */
+        .form-group.pincode-group {
+            position: relative;
+        }
+
+        .pincode-detection-status {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .pincode-detection-status.detecting {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .pincode-detection-status.detected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Mobile-specific enhancements */
+        @media (max-width: 768px) {
+            .checkout-layout {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+            
+            .checkout-form {
+                order: 2;
+            }
+            
+            .order-summary {
+                order: 1;
+                position: static !important;
+                margin-bottom: 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+            
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+                padding: 14px 16px !important;
+                min-height: 44px !important; /* Touch target size */
+            }
+            
+            .checkbox-label {
+                padding: 12px !important;
+                touch-action: manipulation;
+            }
+            
+            .payment-option {
+                padding: 16px !important;
+                margin-bottom: 12px !important;
+                touch-action: manipulation;
+            }
+            
+            .place-order-btn {
+                padding: 18px 24px !important;
+                font-size: 18px !important;
+                min-height: 56px !important;
+            }
+            
+            .copy-btn {
+                padding: 12px 16px !important;
+                font-size: 16px !important;
+                min-height: 44px !important;
+            }
+            
+            .upi-id {
+                font-size: 16px !important;
+                word-break: break-all;
+                line-height: 1.4;
+            }
+            
+            .upi-info {
+                flex-direction: column !important;
+                gap: 12px !important;
+                text-align: center;
+            }
+            
+            .modal-content {
+                margin: 10px !important;
+                width: calc(100% - 20px) !important;
+                max-height: calc(100vh - 40px) !important;
+            }
+            
+            .confirmation-actions {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            
+            .confirmation-actions button {
+                width: 100% !important;
+                min-height: 48px !important;
+            }
+
+            .delivery-area-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .area-details {
+                text-align: center;
+            }
+        }
+        
+        /* Touch-friendly enhancements */
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: 2px solid var(--primary-red);
+            outline-offset: 2px;
+        }
+        
+        .payment-option:active,
+        .delivery-option:active {
+            background-color: var(--light-gold);
+        }
+        
+        /* Improved error display on mobile */
+        @media (max-width: 768px) {
+            .error-message {
+                font-size: 14px !important;
+                margin-top: 8px !important;
+                padding: 8px !important;
+                background: #fee2e2;
+                border-radius: 6px;
+                border-left: 3px solid var(--primary-red);
+            }
+        }
+    </style>
+    <!-- Mobile-specific enhancements -->
+    <script>
+        // Prevent zoom on input focus (iOS)
+        document.addEventListener('touchstart', function() {
+            document.querySelectorAll('input, textarea, select').forEach(function(element) {
+                if (element.style.fontSize !== '16px') {
+                    element.style.fontSize = '16px';
+                }
+            });
+        });
+
+        // Improve mobile form experience
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-scroll to error fields on mobile
+            function scrollToError() {
+                const firstError = document.querySelector('.error-message.show');
+                if (firstError && window.innerWidth <= 768) {
+                    firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }
+
+            // Enhanced mobile validation feedback
+            const form = document.getElementById('checkoutForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!form.checkValidity()) {
+                        e.preventDefault();
+                        setTimeout(scrollToError, 100);
+                    }
+                });
+            }
+
+            // Optimize payment method switching on mobile
+            const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function() {
+                    // Add haptic feedback if available
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                });
+            });
+
+            // Mobile-friendly UPI copy
+            window.copyUpiIdMobile = function() {
+                const upiId = '8949409523@pthdfc';
+                
+                if (navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    navigator.share({
+                        title: 'UPI Payment Details',
+                        text: `UPI ID: ${upiId}\nFor Rakhi Collection Order Payment`
+                    }).catch(() => {
+                        copyUpiId(); // Fallback to regular copy
+                    });
+                } else {
+                    copyUpiId();
+                }
+            };
+
+            // Replace copy function on mobile
+            if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                const copyBtn = document.querySelector('.copy-btn');
+                if (copyBtn) {
+                    copyBtn.onclick = window.copyUpiIdMobile;
+                }
+            }
+        });
+    </script>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Rakhi Collection</h2>
+                <span>by Ruchi Rathi</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="shop.html" class="nav-link">Shop</a></li>
+                <li><a href="cart.html" class="nav-link cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart <span class="cart-count">0</span>
+                </a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Checkout Progress -->
+    <div class="checkout-progress">
+        <div class="container">
+            <div class="progress-steps">
+                <div class="step completed">
+                    <div class="step-number">1</div>
+                    <span>Cart</span>
+                </div>
+                <div class="step active">
+                    <div class="step-number">2</div>
+                    <span>Checkout</span>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <span>Confirmation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Content -->
+    <div class="checkout-container">
+        <div class="container">
+            <div class="checkout-layout">
+                <!-- Checkout Form -->
+                <div class="checkout-form">
+                    <div class="section-header">
+                        <h2>Delivery Information</h2>
+                        <p>Please provide your details for order delivery</p>
+                    </div>
+
+                    <form id="checkoutForm" class="form">
+                        <div class="form-section">
+                            <h3>Contact Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="fullName">Full Name *</label>
+                                    <input type="text" id="fullName" name="fullName" required>
+                                    <div class="error-message" id="fullNameError"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email Address *</label>
+                                    <input type="email" id="email" name="email" required>
+                                    <div class="error-message" id="emailError"></div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="phone">Phone Number *</label>
+                                    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+                                    <div class="error-message" id="phoneError"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="altPhone">Alternate Phone</label>
+                                    <input type="tel" id="altPhone" name="altPhone" pattern="[0-9]{10}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Delivery Address</h3>
+                            <div class="form-group">
+                                <label for="address">Complete Address *</label>
+                                <textarea id="address" name="address" rows="3" placeholder="House/Flat No., Street, Locality" required></textarea>
+                                <div class="error-message" id="addressError"></div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City *</label>
+                                    <input type="text" id="city" name="city" required>
+                                    <div class="error-message" id="cityError"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="state">State</label>
+                                    <input type="text" id="state" name="state" value="Rajasthan">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group pincode-group">
+                                    <label for="pincode">PIN Code *</label>
+                                    <input type="text" id="pincode" name="pincode" pattern="[0-9]{6}" required>
+                                    <div class="pincode-note">Enter 6-digit PIN code to auto-detect delivery charges</div>
+                                    <div class="error-message" id="pincodeError"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Delivery Area</label>
+                                    <div id="deliveryAreaDisplay">
+                                        <div class="delivery-area-info">
+                                            <div class="area-icon">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </div>
+                                            <div class="area-details">
+                                                <strong>Enter PIN code above</strong>
+                                                <span class="area-description">Delivery charges will be calculated automatically</span>
+                                            </div>
+                                            <div class="area-charge">₹30/₹70</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="form-group checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="agreeTerms" required>
+                                    <span class="checkmark"></span>
+                                    <span>I agree to the <a href="#" onclick="showTerms()">Terms and Conditions</a> and understand the payment policy *</span>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <div class="summary-card">
+                        <h3>Your Order</h3>
+                        
+                        <div class="order-items" id="orderItems">
+                            <!-- Order items will be loaded here -->
+                        </div>
+
+                        <div class="summary-calculations">
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span id="orderSubtotal">₹0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Delivery Charges</span>
+                                <span id="orderDelivery">₹30</span>
+                            </div>
+                            <div class="summary-row" id="discountRow" style="display: none;">
+                                <span>Coupon Discount</span>
+                                <span id="orderDiscount">-₹0</span>
+                            </div>
+                            <div class="summary-divider"></div>
+                            <div class="summary-row total-row">
+                                <span>Total Amount</span>
+                                <span id="orderTotal">₹30</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" form="checkoutForm" class="place-order-btn" id="placeOrderBtn">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Place Order</span>
+                        </button>
+
+                        <div class="payment-info">
+                            <h4>Payment Information</h4>
+                            
+                            <div class="payment-method-selector">
+                                <div class="payment-options">
+                                    <label class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="cod" checked>
+                                        <span class="radio-mark"></span>
+                                        <div class="payment-method-info">
+                                            <strong>Cash on Delivery (COD)</strong>
+                                            <span class="payment-description">Available for delivery within Jodhpur</span>
+                                        </div>
+                                    </label>
+                                    <label class="payment-option">
+                                        <input type="radio" name="paymentMethod" value="online">
+                                        <span class="radio-mark"></span>
+                                        <div class="payment-method-info">
+                                            <strong>Online Payment (UPI/Bank Transfer)</strong>
+                                            <span class="payment-description">Required for delivery outside Jodhpur</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="payment-note cod-note">
+                                <i class="fas fa-info-circle"></i>
+                                <p>For delivery within Jodhpur: Pay ₹30 delivery charge + product cost when your order arrives.</p>
+                            </div>
+
+                            <div class="upi-payment-section" id="upiPaymentSection" style="display: none;">
+                                <h5><i class="fas fa-mobile-alt"></i> UPI Payment Details</h5>
+                                <div class="upi-details">
+                                    <div class="upi-info">
+                                        <span class="upi-id">8949409523@pthdfc</span>
+                                        <button type="button" class="copy-btn" onclick="copyUpiId()">
+                                            <i class="fas fa-copy"></i> Copy
+                                        </button>
+                                    </div>
+                                    <div class="upi-instructions">
+                                        <p><strong>Payment Instructions:</strong></p>
+                                        <ul style="margin: 8px 0; padding-left: 20px;">
+                                            <li>Send payment to the UPI ID above</li>
+                                            <li>Include your order ID in payment remarks</li>
+                                            <li>Delivery charge: ₹30 for Jodhpur, ₹70 for outside Jodhpur (included in total above)</li>
+                                            <li>Send payment screenshot to WhatsApp: +91 8949409523</li>
+                                        </ul>
+                                        <p><strong>Note:</strong> Order will be dispatched after payment confirmation.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="confirmation-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>Order Placed Successfully!</h2>
+                <p>Thank you for your order! We've received your request and will contact you shortly to confirm the details.</p>
+                
+                <div class="order-details" id="confirmationOrderDetails">
+                    <!-- Order details will be populated here -->
+                </div>
+
+                <div class="confirmation-actions">
+                    <button onclick="continueShopping()" class="btn-secondary">Continue Shopping</button>
+                    <button onclick="goToHome()" class="cta-button">Go to Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal" id="loadingModal">
+        <div class="modal-content small">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <h3>Placing Your Order...</h3>
+                <p>Please wait while we process your order</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Terms and Conditions</h3>
+                <span class="close" onclick="closeTerms()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="terms-content">
+                    <h4>1. Order Confirmation</h4>
+<p>All orders are confirmed through a phone call or WhatsApp within 24 hours. Please ensure your contact details are accurate to avoid delays.</p>
+
+<h4>2. Delivery Information</h4>
+<p><strong>Within Jodhpur:</strong> ₹30 flat delivery charge.  
+<strong>Outside Jodhpur (All India):</strong> ₹70 flat delivery charge.  
+We aim to deliver within 5-7 business days from the date of confirmation.</p>
+
+<h4>3. Payment Options</h4>
+<p><strong>Cash on Delivery (COD):</strong> Available for Jodhpur only.  
+Outside Jodhpur, we accept advance payments via UPI. Payment details will be shared upon order confirmation.</p>
+
+<h4>4. Quality Assurance</h4>
+<p>Each rakhi is handcrafted and carefully quality-checked before dispatch. Pictures of the exact products will be shared with you before shipping to ensure full transparency.</p>
+
+<h4>5. Return & Refund Policy</h4>
+<p>We do not accept general returns. However, in the rare case a product is received in completely damaged condition, a refund will be provided after verification through shared pictures. Custom designs and minor transit wear are not eligible for refunds.</p>
+
+<h4>6. Contact Us</h4>
+<p>For order updates or queries, feel free to contact us at <strong>+91 8949409523</strong>. We're happy to assist you!</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Rakhi Collection by Ruchi Rathi</h3>
+                    <p>Your trusted destination for beautifully curated rakhis — handpicked with love to make your Raksha Bandhan truly memorable.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="shop.html">Shop All Rakhis</a></li>
+                        <li><a href="cart.html">My Cart</a></li>
+                        <li><a href="checkout.html">Checkout</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>A-31, Umed Club Road, Raika Bagh, Jodhpur, Rajasthan</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <a href="tel:+919460250677">+91 9460250677</a><br>
+                                <a href="tel:+918949409523">+91 8949409523</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Rakhi Collection by Ruchi Rathi. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/checkout.js"></script>
+</body>
+</html>
