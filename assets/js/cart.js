@@ -93,7 +93,10 @@ function createCartItem(item) {
             <div class="cart-item-details">
                 <h4>${item.name}</h4>
                 <p>${item.category}</p>
-                <div class="cart-item-price">${formatPrice(item.price)}</div>
+                <div class="cart-item-price">
+    ${formatPrice(item.price)}
+    <div class="price-note">Per piece</div>
+</div>
                 ${maxStock <= 5 ? `<div class="low-stock" style="color: #f59e0b; font-size: 0.8rem; margin-top: 4px;">Only ${maxStock} left in stock!</div>` : ''}
             </div>
             <div class="quantity-controls">

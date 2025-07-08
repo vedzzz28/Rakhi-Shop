@@ -543,7 +543,10 @@ function createProductCard(product) {
             <div class="product-info">
                 <div class="product-category">${product.category}</div>
                 <h3 class="product-title">${product.name}</h3>
-                <div class="product-price">${formatPrice(product.price)}</div>
+                <div class="product-price">
+                    ${formatPrice(product.price)}
+                    <div class="price-note">Per piece</div>
+                </div>
                 ${product.stock <= 5 && product.stock > 0 ? `<div class="low-stock">Only ${product.stock} left!</div>` : ''}
                 
                 ${inCartQuantity > 0 ? `
@@ -706,7 +709,10 @@ function openQuickView(productId) {
         <div class="quick-view-details">
             <div class="quick-view-category">${product.category}</div>
             <h2 class="quick-view-title">${product.name}</h2>
-            <div class="quick-view-price">${formatPrice(product.price)}</div>
+            <div class="quick-view-price">
+    ${formatPrice(product.price)}
+    <div class="price-note">Per piece</div>
+</div>
             <div class="quick-view-stock">
                 <span class="stock-status ${stockClass}">${stockStatus}</span>
                 ${inCartQuantity > 0 ? `<div class="cart-info"><i class="fas fa-shopping-cart"></i> ${inCartQuantity} in cart</div>` : ''}
