@@ -144,10 +144,23 @@
             }
             
             .checkbox-label {
-                padding: 12px !important;
-                touch-action: manipulation;
-            }
-            
+    padding: 16px !important; /* Increased padding for better touch target */
+    touch-action: manipulation;
+}
+
+/* ADD THIS NEW CSS RULE */
+@media (max-width: 768px) {
+    .checkbox-label .checkmark {
+        width: 32px !important;  /* Even larger on mobile */
+        height: 32px !important;
+        border: 3px solid var(--gray) !important;
+        margin-top: 0 !important;
+    }
+    
+    .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+        font-size: 18px !important; /* Larger checkmark on mobile */
+    }
+}
             .payment-option {
                 padding: 16px !important;
                 margin-bottom: 12px !important;
