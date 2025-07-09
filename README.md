@@ -54,7 +54,7 @@ rakhi-003,Kids Cartoon Rakhi,149,,Kids,25,Colorful cartoon character rakhi
 - **Name**: Product name (Required)
 - **Price**: Number only, no currency symbol (Required)
 - **Image**: Full URL or leave empty for default images
-- **Category**: Must be one of: Designer, Silver, Kids, Bhaiya-Bhabhi, Kumkum-Chawal
+- **Category**: Must be one of: Designer, Silver, Kids, Bhaiya-Bhabhi, Sacred-Accessories
 - **Stock**: Available quantity (0 = out of stock)
 - **Description**: Product description
 
