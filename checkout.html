@@ -88,6 +88,52 @@
             font-style: italic;
         }
 
+        /* Enhanced T&C Checkbox Styles */
+        .checkbox-group {
+            margin: 25px 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .checkbox-label:hover {
+            border-color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .custom-checkbox-large {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #cbd5e1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            margin-top: 2px;
+        }
+
+        .checkbox-label:hover .custom-checkbox-large {
+            border-color: #3b82f6;
+        }
+
         /* Enhanced form styles */
         .form-group.pincode-group {
             position: relative;
@@ -144,23 +190,22 @@
             }
             
             .checkbox-label {
-    padding: 16px !important; /* Increased padding for better touch target */
-    touch-action: manipulation;
-}
+                padding: 20px !important; /* Even larger padding for mobile */
+                touch-action: manipulation;
+                font-size: 1rem !important;
+            }
 
-/* ADD THIS NEW CSS RULE */
-@media (max-width: 768px) {
-    .checkbox-label .checkmark {
-        width: 32px !important;  /* Even larger on mobile */
-        height: 32px !important;
-        border: 3px solid var(--gray) !important;
-        margin-top: 0 !important;
-    }
-    
-    .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
-        font-size: 18px !important; /* Larger checkmark on mobile */
-    }
-}
+            .custom-checkbox-large {
+                width: 32px !important;  /* Even larger on mobile */
+                height: 32px !important;
+                border: 3px solid #cbd5e1 !important;
+                margin-top: 0 !important;
+            }
+            
+            .custom-checkbox-large i {
+                font-size: 18px !important; /* Larger checkmark on mobile */
+            }
+            
             .payment-option {
                 padding: 16px !important;
                 margin-bottom: 12px !important;
@@ -243,7 +288,32 @@
                 border-left: 3px solid var(--primary-red);
             }
         }
+
+        /* Pre-filled pincode styling */
+        .form-group input[readonly] {
+            background: #f0f9ff !important;
+            border: 2px solid #3b82f6 !important;
+            color: #1e40af !important;
+            font-weight: 600 !important;
+        }
+
+        /* Enhanced alert styling for T&C */
+        .terms-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 3px solid #dc2626;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            max-width: 90%;
+            text-align: center;
+        }
     </style>
+    
     <!-- Mobile-specific enhancements -->
     <script>
         // Prevent zoom on input focus (iOS)
@@ -315,6 +385,7 @@
             }
         });
     </script>
+</head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
@@ -420,7 +491,7 @@
                                 <div class="form-group pincode-group">
                                     <label for="pincode">PIN Code *</label>
                                     <input type="text" id="pincode" name="pincode" pattern="[0-9]{6}" required>
-                                    <div class="pincode-note">Enter 6-digit PIN code to auto-detect delivery charges</div>
+                                    <div class="pincode-note">Auto-filled from cart selection</div>
                                     <div class="error-message" id="pincodeError"></div>
                                 </div>
                                 <div class="form-group">
@@ -431,10 +502,10 @@
                                                 <i class="fas fa-map-marker-alt"></i>
                                             </div>
                                             <div class="area-details">
-                                                <strong>Enter PIN code above</strong>
-                                                <span class="area-description">Delivery charges will be calculated automatically</span>
+                                                <strong>Loading delivery information...</strong>
+                                                <span class="area-description">Please wait</span>
                                             </div>
-                                            <div class="area-charge">₹30/₹70</div>
+                                            <div class="area-charge">...</div>
                                         </div>
                                     </div>
                                 </div>
@@ -444,8 +515,7 @@
                         <div class="form-section">
                             <div class="form-group checkbox-group">
                                 <label class="checkbox-label">
-                                    <input type="checkbox" id="agreeTerms" required>
-                                    <span class="checkmark"></span>
+                                    <input type="checkbox" id="agreeTerms">
                                     <span>I agree to the <a href="#" onclick="showTerms()">Terms and Conditions</a> and understand the payment policy *</span>
                                 </label>
                             </div>
@@ -469,7 +539,7 @@
                             </div>
                             <div class="summary-row">
                                 <span>Delivery Charges</span>
-                                <span id="orderDelivery">₹30</span>
+                                <span id="orderDelivery">₹0</span>
                             </div>
                             <div class="summary-row" id="discountRow" style="display: none;">
                                 <span>Coupon Discount</span>
@@ -478,7 +548,7 @@
                             <div class="summary-divider"></div>
                             <div class="summary-row total-row">
                                 <span>Total Amount</span>
-                                <span id="orderTotal">₹30</span>
+                                <span id="orderTotal">₹0</span>
                             </div>
                         </div>
 
@@ -513,7 +583,7 @@
 
                             <div class="payment-note cod-note">
                                 <i class="fas fa-info-circle"></i>
-                                <p>For delivery within Jodhpur: Pay ₹30 delivery charge + product cost when your order arrives.</p>
+                                <p>For delivery within Jodhpur: Pay delivery charge + product cost when your order arrives.</p>
                             </div>
 
                             <div class="upi-payment-section" id="upiPaymentSection" style="display: none;">
@@ -530,7 +600,7 @@
                                         <ul style="margin: 8px 0; padding-left: 20px;">
                                             <li>Send payment to the UPI ID above</li>
                                             <li>Include your order ID in payment remarks</li>
-                                            <li>Delivery charge: ₹30 for Jodhpur, ₹70 for outside Jodhpur (included in total above)</li>
+                                            <li>Delivery charge included in total above</li>
                                             <li>Send payment screenshot to WhatsApp: +91 8949409523</li>
                                         </ul>
                                         <p><strong>Note:</strong> Order will be dispatched after payment confirmation.</p>
@@ -587,26 +657,29 @@
             <div class="modal-body">
                 <div class="terms-content">
                     <h4>1. Order Confirmation</h4>
-<p>All orders are confirmed through a phone call or WhatsApp within 24 hours. Please ensure your contact details are accurate to avoid delays.</p>
+                    <p>All orders are confirmed through a phone call or WhatsApp within 24 hours. Please ensure your contact details are accurate to avoid delays.</p>
 
-<h4>2. Delivery Information</h4>
-<p><strong>Within Jodhpur:</strong> ₹30 flat delivery charge.  
-<strong>Outside Jodhpur (All India):</strong> ₹70 flat delivery charge.  
-We aim to deliver within 5-7 business days from the date of confirmation.</p>
+                    <h4>2. Delivery Information</h4>
+                    <p><strong>Within Jodhpur:</strong> ₹20 - Delivered within 1-2 business days.</p>
+                    <p><strong>Outside Jodhpur:</strong></p>
+                    <ul>
+                        <li><strong>Normal Delivery:</strong> ₹60 - Delivered within 5-7 business days</li>
+                        <li><strong>Fast Track Delivery:</strong> ₹200 - Delivered within 3-4 business days</li>
+                    </ul>
+                    <p>We aim to deliver within the specified timeframe from the date of confirmation.</p>
 
-<h4>3. Payment Options</h4>
-<p><strong>Cash on Delivery (COD):</strong> Available for Jodhpur only.  
-Outside Jodhpur, we accept advance payments via UPI. Payment details will be shared upon order confirmation.</p>
+                    <h4>3. Payment Options</h4>
+                    <p><strong>Cash on Delivery (COD):</strong> Available for Jodhpur only.</p>
+                    <p><strong>Online Payment (UPI):</strong> Required for delivery outside Jodhpur. Payment details will be shared upon order confirmation.</p>
 
-<h4>4. Quality Assurance</h4>
-<p>Each rakhi is handcrafted and carefully quality-checked before dispatch. Pictures of the exact products will be shared with you before shipping to ensure full transparency.</p>
+                    <h4>4. Quality Assurance</h4>
+                    <p>Each rakhi is handcrafted and carefully quality-checked before dispatch. Pictures of the exact products will be shared with you before shipping to ensure full transparency.</p>
 
-<h4>5. Return & Refund Policy</h4>
-<p>We do not accept general returns. However, in the rare case a product is received in completely damaged condition, a refund will be provided after verification through shared pictures. Custom designs and minor transit wear are not eligible for refunds.</p>
+                    <h4>5. Return & Refund Policy</h4>
+                    <p>We do not accept general returns. However, in the rare case a product is received in completely damaged condition, a refund will be provided after verification through shared pictures. Custom designs and minor transit wear are not eligible for refunds.</p>
 
-<h4>6. Contact Us</h4>
-<p>For order updates or queries, feel free to contact us at <strong>+91 8949409523</strong>. We're happy to assist you!</p>
-
+                    <h4>6. Contact Us</h4>
+                    <p>For order updates or queries, feel free to contact us at <strong>+91 8949409523</strong> or <strong>+91 9460250677</strong>. We're happy to assist you!</p>
                 </div>
             </div>
         </div>

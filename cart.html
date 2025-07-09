@@ -28,6 +28,152 @@
             }
         }
         
+        /* Pincode Section Styles */
+        .pincode-section {
+            background: linear-gradient(135deg, #f0f9ff, #e0e7ff);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .pincode-section h4 {
+            color: #1e40af;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .pincode-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .pincode-input-group input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        
+        .pincode-input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .detect-btn {
+            padding: 12px 18px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .detect-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .pincode-message {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .pincode-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .pincode-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .pincode-message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        
+        /* Enhanced Delivery Options */
+        .delivery-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .delivery-option:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        
+        .delivery-option.selected {
+            border-color: #10b981;
+            background: #ecfdf5;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+        
+        .delivery-option input[type="radio"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .delivery-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .delivery-info strong {
+            color: #1f2937;
+            font-size: 1rem;
+        }
+        
+        .delivery-time {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        
+        .delivery-price {
+            color: #dc2626;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
         @media (max-width: 768px) {
             .cart-container {
                 padding: 30px 0;
@@ -151,6 +297,41 @@
             .continue-btn {
                 padding: 12px 16px !important;
                 font-size: 0.95rem !important;
+            }
+            
+            /* Mobile pincode section */
+            .pincode-section {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .pincode-section h4 {
+                font-size: 1rem;
+            }
+            
+            .pincode-input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .pincode-input-group input {
+                padding: 14px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            
+            .detect-btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+            
+            .delivery-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .delivery-time {
+                margin-left: 0;
             }
         }
         
@@ -308,6 +489,127 @@
                 margin-top: 2px !important;
             }
         }
+
+        /* Coupon Suggestions Styling */
+        .coupon-suggestions {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid var(--primary-gold);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+            to { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+        }
+        
+        .coupon-suggestions h4 {
+            color: var(--dark-gray);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .coupon-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .coupon-card-suggestion {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-red);
+            transition: all 0.3s ease;
+        }
+        
+        .coupon-card-suggestion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .coupon-info {
+            flex: 1;
+        }
+        
+        .coupon-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .coupon-icon {
+            font-size: 1.2rem;
+        }
+        
+        .coupon-code {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1.1rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .coupon-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        
+        .coupon-savings {
+            color: var(--primary-gold);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .apply-coupon-quick {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .apply-coupon-quick:hover {
+            background: var(--dark-red);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .coupon-suggestions {
+                padding: 20px;
+                margin: 15px 0;
+            }
+            
+            .coupon-card-suggestion {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 15px;
+            }
+            
+            .apply-coupon-quick {
+                width: 100%;
+                padding: 12px;
+            }
+            
+            .coupon-header {
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -394,36 +696,23 @@
                         <div class="summary-card">
                             <h3>Order Summary</h3>
                             
+                            <!-- Pincode Section will be inserted here by JavaScript -->
+                            
                             <div class="summary-row">
                                 <span>Subtotal (<span id="itemCount">0</span> items)</span>
                                 <span id="subtotal">₹0</span>
                             </div>
 
-                            <div class="delivery-section">
+                            <div class="delivery-section" style="display: none;">
                                 <h4>Delivery Options</h4>
                                 <div class="delivery-options">
-                                    <label class="delivery-option">
-                                        <input type="radio" name="delivery" value="jodhpur">
-                                        <span class="radio-mark"></span>
-                                        <div class="delivery-info">
-                                            <strong>Within Jodhpur</strong>
-                                            <span class="delivery-price">₹30</span>
-                                        </div>
-                                    </label>
-                                    <label class="delivery-option">
-                                        <input type="radio" name="delivery" value="outside">
-                                        <span class="radio-mark"></span>
-                                        <div class="delivery-info">
-                                            <strong>Outside Jodhpur</strong>
-                                            <span class="delivery-price">₹70 (Courier charges)</span>
-                                        </div>
-                                    </label>
+                                    <!-- Delivery options will be populated by JavaScript -->
                                 </div>
                             </div>
 
                             <div class="summary-row">
                                 <span>Delivery Charges</span>
-                                <span id="deliveryCharges">₹30</span>
+                                <span id="deliveryCharges">Enter pincode</span>
                             </div>
                             <div class="summary-row" id="discountRow" style="display: none;">
                                 <span>Coupon Discount</span>
@@ -433,12 +722,11 @@
 
                             <div class="summary-row total-row">
                                 <span>Total Amount</span>
-                                <span id="totalAmount">₹30</span>
+                                <span id="totalAmount">₹0</span>
                             </div>
 
-                            <button onclick="proceedToCheckout()" class="checkout-btn" id="checkoutBtn">
-                                <span>Proceed to Checkout</span>
-                                <i class="fas fa-arrow-right"></i>
+                            <button onclick="proceedToCheckout()" class="checkout-btn" id="checkoutBtn" disabled>
+                                <span>Enter Pincode to Continue</span>
                             </button>
 
                             <div class="payment-security">
