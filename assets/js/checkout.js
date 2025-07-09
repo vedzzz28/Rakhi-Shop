@@ -1,6 +1,6 @@
-// ===== CHECKOUT PAGE JAVASCRIPT =====
+// ===== CHECKOUT PAGE JAVASCRIPT - ENHANCED VERSION =====
 let checkoutCart = [];
-let deliveryArea = 'jodhpur';
+let deliveryData = null; // Will be loaded from cart
 let appliedCouponData = null; // Store full coupon data for dynamic calculation
 let isSubmitting = false;
 
@@ -31,20 +31,21 @@ async function initializeCheckout() {
         // Initialize EmailJS
         await initializeEmailJS();
         
-        // Load cart and setup page
+        // Load data and setup page
         loadCheckoutData();
+        
+        // Check if required data exists
+        if (!validateCheckoutData()) {
+            return;
+        }
+        
         loadOrderItems();
         setupFormValidation();
         setupPaymentMethodHandling();
-        setupPincodeDetection(); // New function for pincode detection
+        autoPopulateFormData(); // Auto-populate form with delivery data
         updateOrderSummary();
         setMinDeliveryDate();
-        
-        // Check if cart is empty
-        if (checkoutCart.length === 0) {
-            redirectToCart();
-            return;
-        }
+        enhanceTermsCheckbox(); // Make T&C checkbox bigger
         
     } catch (error) {
         console.error('Error initializing checkout:', error);
@@ -52,84 +53,175 @@ async function initializeCheckout() {
     }
 }
 
-// ===== SETUP PINCODE-BASED DELIVERY DETECTION =====
-function setupPincodeDetection() {
-    const pincodeInput = document.getElementById('pincode');
-    if (pincodeInput) {
-        pincodeInput.addEventListener('input', function() {
-            const pincode = this.value.trim();
-            if (pincode.length === 6 && /^\d{6}$/.test(pincode)) {
-                detectDeliveryArea(pincode);
+// ===== VALIDATE CHECKOUT DATA =====
+function validateCheckoutData() {
+    if (checkoutCart.length === 0) {
+        redirectToCart('Your cart is empty');
+        return false;
+    }
+    
+    if (!deliveryData || !deliveryData.pincode) {
+        redirectToCart('Please select delivery options in cart first');
+        return false;
+    }
+    
+    return true;
+}
+
+// ===== ENHANCE TERMS CHECKBOX =====
+function enhanceTermsCheckbox() {
+    const termsCheckbox = document.getElementById('agreeTerms');
+    const checkboxLabel = termsCheckbox?.closest('.checkbox-label');
+    
+    if (checkboxLabel) {
+        // Add enhanced styling
+        checkboxLabel.style.cssText = `
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 15px !important;
+            padding: 20px !important;
+            border: 2px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            background: #f8f9fa !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        `;
+        
+        // Create custom larger checkbox
+        const customCheckbox = document.createElement('div');
+        customCheckbox.className = 'custom-checkbox-large';
+        customCheckbox.style.cssText = `
+            width: 28px !important;
+            height: 28px !important;
+            border: 3px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: white !important;
+            flex-shrink: 0 !important;
+            transition: all 0.3s ease !important;
+            margin-top: 2px !important;
+        `;
+        
+        // Hide original checkbox
+        termsCheckbox.style.display = 'none';
+        
+        // Insert custom checkbox
+        checkboxLabel.insertBefore(customCheckbox, checkboxLabel.firstChild);
+        
+        // Add click handler
+        checkboxLabel.addEventListener('click', function(e) {
+            e.preventDefault();
+            termsCheckbox.checked = !termsCheckbox.checked;
+            updateCustomCheckbox();
+            
+            // Add visual feedback
+            checkboxLabel.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                checkboxLabel.style.transform = 'scale(1)';
+            }, 150);
+        });
+        
+        // Update appearance function
+        function updateCustomCheckbox() {
+            if (termsCheckbox.checked) {
+                customCheckbox.style.background = '#10b981';
+                customCheckbox.style.borderColor = '#10b981';
+                customCheckbox.innerHTML = '<i class="fas fa-check" style="color: white; font-size: 16px;"></i>';
+                checkboxLabel.style.borderColor = '#10b981';
+                checkboxLabel.style.background = '#ecfdf5';
+            } else {
+                customCheckbox.style.background = 'white';
+                customCheckbox.style.borderColor = '#cbd5e1';
+                customCheckbox.innerHTML = '';
+                checkboxLabel.style.borderColor = '#e5e7eb';
+                checkboxLabel.style.background = '#f8f9fa';
+            }
+        }
+        
+        // Initial state
+        updateCustomCheckbox();
+        
+        // Listen for checkbox changes
+        termsCheckbox.addEventListener('change', updateCustomCheckbox);
+        
+        // Add hover effect
+        checkboxLabel.addEventListener('mouseenter', function() {
+            if (!termsCheckbox.checked) {
+                checkboxLabel.style.borderColor = '#3b82f6';
+                checkboxLabel.style.background = '#f0f9ff';
             }
         });
         
-        pincodeInput.addEventListener('blur', function() {
-            const pincode = this.value.trim();
-            if (pincode.length === 6 && /^\d{6}$/.test(pincode)) {
-                detectDeliveryArea(pincode);
+        checkboxLabel.addEventListener('mouseleave', function() {
+            if (!termsCheckbox.checked) {
+                checkboxLabel.style.borderColor = '#e5e7eb';
+                checkboxLabel.style.background = '#f8f9fa';
             }
         });
     }
 }
 
-// ===== DETECT DELIVERY AREA FROM PINCODE =====
-function detectDeliveryArea(pincode) {
-    const isJodhpur = JODHPUR_PINCODES.includes(pincode);
-    const previousArea = deliveryArea;
+// ===== AUTO-POPULATE FORM DATA =====
+function autoPopulateFormData() {
+    if (!deliveryData) return;
     
-    deliveryArea = isJodhpur ? 'jodhpur' : 'outside';
-    
-    // Update delivery area display
-    updateDeliveryAreaDisplay(isJodhpur);
-    
-    // Update payment methods based on area
-    updatePaymentMethodBasedOnDelivery();
-    
-    // Update order summary
-    updateOrderSummary();
-    
-    // Show notification if area changed
-    if (previousArea !== deliveryArea) {
-        const areaName = isJodhpur ? 'within Jodhpur' : 'outside Jodhpur';
-        const charge = isJodhpur ? '₹30' : '₹70';
-        showToast(`Delivery area detected: ${areaName} (${charge})`, 'info');
-        
-        // Check if current coupon is still valid
-        if (appliedCouponData && appliedCouponData.deliveryArea && appliedCouponData.deliveryArea !== deliveryArea) {
-            // Note: If you have coupon functionality, uncomment the next lines
-            // removeCoupon();
-            // showToast('Coupon removed: Not valid for detected delivery area', 'warning');
-        }
+    // Auto-populate pincode
+    const pincodeInput = document.getElementById('pincode');
+    if (pincodeInput && deliveryData.pincode) {
+        pincodeInput.value = deliveryData.pincode;
+        pincodeInput.readOnly = true; // Make it read-only
+        pincodeInput.style.background = '#f0f9ff';
+        pincodeInput.style.border = '2px solid #3b82f6';
     }
+    
+    // Update delivery area display immediately
+    updateDeliveryAreaDisplay();
+    
+    // Set payment method based on delivery area
+    updatePaymentMethodBasedOnDelivery();
 }
 
 // ===== UPDATE DELIVERY AREA DISPLAY =====
-function updateDeliveryAreaDisplay(isJodhpur) {
+function updateDeliveryAreaDisplay() {
+    if (!deliveryData) return;
+    
     const deliveryDisplay = document.getElementById('deliveryAreaDisplay');
-    const deliveryChargeDisplay = document.getElementById('deliveryChargeDisplay');
     
     if (deliveryDisplay) {
+        const isJodhpur = deliveryData.area === 'jodhpur';
+        const deliveryText = getDeliveryOptionText();
+        
         deliveryDisplay.innerHTML = `
-            <div class="delivery-area-info">
+            <div class="delivery-area-info ${isJodhpur ? 'jodhpur' : 'outside'}">
                 <div class="area-icon">
                     <i class="fas fa-${isJodhpur ? 'home' : 'truck'}"></i>
                 </div>
                 <div class="area-details">
                     <strong>${isJodhpur ? 'Within Jodhpur' : 'Outside Jodhpur'}</strong>
-                    <span class="area-description">
-                        ${isJodhpur ? 'Local delivery available' : 'Courier delivery required'}
-                    </span>
+                    <span class="area-description">${deliveryText}</span>
                 </div>
-                <div class="area-charge">
-                    ${isJodhpur ? '₹30' : '₹70'}
-                </div>
+                <div class="area-charge">₹${deliveryData.charge}</div>
             </div>
         `;
     }
+}
+
+// ===== GET DELIVERY OPTION TEXT =====
+function getDeliveryOptionText() {
+    if (!deliveryData) return '';
     
-    if (deliveryChargeDisplay) {
-        deliveryChargeDisplay.textContent = isJodhpur ? '₹30' : '₹70';
+    if (deliveryData.area === 'jodhpur') {
+        return '1-2 business days';
+    } else {
+        if (deliveryData.option === 'outside-normal') {
+            return 'Normal delivery: 5-7 business days';
+        } else if (deliveryData.option === 'outside-fasttrack') {
+            return 'Fast track delivery: 3-4 business days';
+        }
     }
+    return '';
 }
 
 // ===== INITIALIZE EMAILJS =====
@@ -150,13 +242,23 @@ async function initializeEmailJS() {
 // ===== LOAD CHECKOUT DATA =====
 function loadCheckoutData() {
     checkoutCart = JSON.parse(localStorage.getItem('cart')) || [];
-    deliveryArea = localStorage.getItem('selectedDeliveryArea') || 'jodhpur';
     
+    // Load delivery data from cart
+    const savedDeliveryData = localStorage.getItem('deliveryData');
+    if (savedDeliveryData) {
+        try {
+            deliveryData = JSON.parse(savedDeliveryData);
+        } catch (error) {
+            console.error('Error parsing delivery data:', error);
+        }
+    }
+    
+    // Load coupon data
     const couponData = localStorage.getItem('appliedCoupon');
     if (couponData) {
         try {
             const parsedCoupon = JSON.parse(couponData);
-            if (parsedCoupon.type && parsedCoupon.minOrder) {
+            if (parsedCoupon.type && parsedCoupon.minOrder !== undefined) {
                 appliedCouponData = parsedCoupon;
                 console.log('Loaded coupon data for checkout:', appliedCouponData);
             }
@@ -191,14 +293,23 @@ function loadOrderItems() {
 // ===== UPDATE ORDER SUMMARY =====
 function updateOrderSummary() {
     const subtotal = checkoutCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    let deliveryCharge = deliveryArea.toLowerCase() === 'jodhpur' ? 30 : 70;
+    let deliveryCharge = deliveryData ? deliveryData.charge : 0;
     
     let currentDiscount = 0;
     if (appliedCouponData && subtotal >= appliedCouponData.minOrder) {
-        if (appliedCouponData.type === 'percentage') {
-            currentDiscount = Math.round((subtotal * appliedCouponData.discount) / 100);
-        } else {
-            currentDiscount = appliedCouponData.discount;
+        // Check delivery area requirement for coupon
+        if (!appliedCouponData.deliveryArea || appliedCouponData.deliveryArea === deliveryData?.area) {
+            if (appliedCouponData.type === 'percentage') {
+                currentDiscount = Math.round((subtotal * appliedCouponData.discount) / 100);
+                if (appliedCouponData.maxDiscount) {
+                    currentDiscount = Math.min(currentDiscount, appliedCouponData.maxDiscount);
+                }
+            } else if (appliedCouponData.type === 'fixed') {
+                currentDiscount = appliedCouponData.discount;
+            } else if (appliedCouponData.type === 'delivery') {
+                // For delivery discount, return the minimum of delivery charge or max discount
+                currentDiscount = Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
+            }
         }
     }
     
@@ -212,15 +323,28 @@ function updateOrderSummary() {
 
     if (orderSubtotal) orderSubtotal.textContent = formatPrice(subtotal);
     if (orderDelivery) {
-        const areaText = deliveryArea === 'jodhpur' ? '' : ' (Courier)';
-        orderDelivery.textContent = formatPrice(deliveryCharge) + areaText;
+        let deliveryText = formatPrice(deliveryCharge);
+        if (deliveryData) {
+            if (deliveryData.option === 'outside-normal') {
+                deliveryText += ' (Normal)';
+            } else if (deliveryData.option === 'outside-fasttrack') {
+                deliveryText += ' (Fast Track)';
+            }
+        }
+        orderDelivery.textContent = deliveryText;
     }
 
     if (discountRow) {
         if (currentDiscount > 0 && appliedCouponData) {
             discountRow.style.display = 'flex';
             if (orderDiscount) {
-                orderDiscount.textContent = `- ${formatPrice(currentDiscount)}`;
+                let discountText = `- ${formatPrice(currentDiscount)}`;
+                if (appliedCouponData.type === 'gift') {
+                    discountText = `FREE: ${appliedCouponData.gift}`;
+                } else if (appliedCouponData.type === 'delivery') {
+                    discountText = `FREE DELIVERY: -${formatPrice(currentDiscount)}`;
+                }
+                orderDiscount.textContent = discountText;
             }
         } else {
             discountRow.style.display = 'none';
@@ -258,7 +382,7 @@ function updatePaymentMethodBasedOnDelivery() {
     const upiSection = document.getElementById('upiPaymentSection');
     const codNote = document.querySelector('.cod-note');
     
-    if (deliveryArea === 'outside') {
+    if (deliveryData && deliveryData.area === 'outside') {
         if (codRadio) {
             codRadio.disabled = true;
             codRadio.parentElement.style.opacity = '0.5';
@@ -409,6 +533,7 @@ function validateField(field) {
             break;
             
         case 'pincode':
+            // Pincode is pre-filled and validated from cart
             if (!value) {
                 showFieldError(fieldId, 'PIN code is required');
                 return false;
@@ -417,8 +542,6 @@ function validateField(field) {
                 showFieldError(fieldId, 'Please enter a valid 6-digit PIN code');
                 return false;
             }
-            // Auto-detect delivery area when pincode is valid
-            detectDeliveryArea(value);
             break;
     }
     
@@ -443,8 +566,40 @@ function validateForm() {
     });
     
     const agreeTerms = document.getElementById('agreeTerms');
-    if (agreeTerms && !agreeTerms.checked) {
-        showToast('Please agree to the terms and conditions', 'error');
+    if (!agreeTerms.checked) {
+        // Show prominent alert for T&C
+        const alertMessage = `🚨 IMPORTANT: Terms & Conditions Agreement Required
+
+You must agree to our Terms and Conditions to place your order.
+
+Please check the checkbox above to:
+✓ Agree to our delivery policy
+✓ Confirm payment terms
+✓ Accept our quality assurance policy
+
+This ensures both you and we understand the order process clearly.`;
+        
+        alert(alertMessage);
+        
+        // Scroll to and highlight the terms checkbox
+        const termsSection = agreeTerms.closest('.checkbox-label');
+        if (termsSection) {
+            termsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Add prominent flashing animation
+            termsSection.style.animation = 'flash 0.5s ease-in-out 5';
+            termsSection.style.borderColor = '#dc2626';
+            termsSection.style.background = '#fee2e2';
+            termsSection.style.boxShadow = '0 0 20px rgba(220, 38, 38, 0.5)';
+            
+            setTimeout(() => {
+                termsSection.style.animation = '';
+                termsSection.style.borderColor = '#e5e7eb';
+                termsSection.style.background = '#f8f9fa';
+                termsSection.style.boxShadow = '';
+            }, 2500);
+        }
+        
         isValid = false;
     }
     
@@ -458,7 +613,7 @@ async function handleFormSubmit(event) {
     if (isSubmitting) return;
     
     if (!validateForm()) {
-        showToast('Please fix the errors and try again', 'error');
+        showToast('Please complete the form and try again', 'error');
         return;
     }
     
@@ -485,14 +640,21 @@ function collectOrderData() {
     const formData = new FormData(form);
     
     const subtotal = checkoutCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const deliveryCharge = deliveryArea === 'jodhpur' ? 30 : 70;
+    const deliveryCharge = deliveryData ? deliveryData.charge : 0;
     
     let currentDiscount = 0;
     if (appliedCouponData && subtotal >= appliedCouponData.minOrder) {
-        if (appliedCouponData.type === 'percentage') {
-            currentDiscount = Math.round((subtotal * appliedCouponData.discount) / 100);
-        } else {
-            currentDiscount = appliedCouponData.discount;
+        if (!appliedCouponData.deliveryArea || appliedCouponData.deliveryArea === deliveryData?.area) {
+            if (appliedCouponData.type === 'percentage') {
+                currentDiscount = Math.round((subtotal * appliedCouponData.discount) / 100);
+                if (appliedCouponData.maxDiscount) {
+                    currentDiscount = Math.min(currentDiscount, appliedCouponData.maxDiscount);
+                }
+            } else if (appliedCouponData.type === 'fixed') {
+                currentDiscount = appliedCouponData.discount;
+            } else if (appliedCouponData.type === 'delivery') {
+                currentDiscount = Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
+            }
         }
     }
     
@@ -521,9 +683,11 @@ function collectOrderData() {
         },
         items: checkoutCart,
         delivery: {
-            area: deliveryArea,
+            area: deliveryData?.area || 'unknown',
+            option: deliveryData?.option || 'unknown',
             charge: deliveryCharge,
-            areaName: deliveryArea === 'jodhpur' ? 'Within Jodhpur' : 'Outside Jodhpur'
+            areaName: deliveryData?.area === 'jodhpur' ? 'Within Jodhpur' : 'Outside Jodhpur',
+            optionText: getDeliveryOptionText()
         },
         payment: {
             subtotal: subtotal,
@@ -600,6 +764,7 @@ function prepareOwnerEmailData(orderData) {
         
         // Delivery and payment
         delivery_area: orderData.delivery.areaName,
+        delivery_option: orderData.delivery.optionText,
         payment_method: orderData.payment.method,
         upi_id: orderData.payment.upiId || 'Not applicable (COD)',
         coupon_applied: orderData.coupon ? `${orderData.coupon.code} (${orderData.coupon.type === 'percentage' ? orderData.coupon.discount + '%' : '₹' + orderData.coupon.discount} off)` : 'None'
@@ -611,7 +776,6 @@ function prepareCustomerEmailData(orderData) {
     const itemsList = orderData.items.map(item => 
         `${item.name} (${item.category}) - Qty: ${item.quantity} x ₹${item.price} each = ₹${item.price * item.quantity}`
     ).join('\n');
-
 
     return {
         // Required by EmailJS
@@ -632,6 +796,7 @@ function prepareCustomerEmailData(orderData) {
 
         // Delivery
         delivery_address: `${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} - ${orderData.customer.pincode}`,
+        delivery_option: orderData.delivery.optionText,
         
         // Payment
         payment_method: orderData.payment.method || 'N/A',
@@ -646,7 +811,6 @@ function prepareCustomerEmailData(orderData) {
         coupon_applied: orderData.coupon ? `${orderData.coupon.code} (${orderData.coupon.type === 'percentage' ? orderData.coupon.discount + '%' : '₹' + orderData.coupon.discount} off)` : 'None'
     };
 }
-
 
 // ===== SHOW ORDER CONFIRMATION =====
 function showOrderConfirmation(orderData) {
@@ -666,7 +830,7 @@ function showOrderConfirmation(orderData) {
                     <p>${orderData.customer.address}, ${orderData.customer.city} - ${orderData.customer.pincode}</p>
                     <p class="delivery-area-info">
                         <i class="fas fa-${orderData.delivery.area === 'jodhpur' ? 'home' : 'truck'}"></i>
-                        ${orderData.delivery.areaName} (${formatPrice(orderData.delivery.charge)})
+                        ${orderData.delivery.areaName} - ${orderData.delivery.optionText} (${formatPrice(orderData.delivery.charge)})
                     </p>
                 </div>
                 <div class="order-summary">
@@ -699,7 +863,7 @@ function showOrderConfirmation(orderData) {
 // ===== CLEAR ORDER DATA =====
 function clearOrderData() {
     localStorage.removeItem('cart');
-    localStorage.removeItem('selectedDeliveryArea');
+    localStorage.removeItem('deliveryData');
     localStorage.removeItem('appliedCoupon');
     localStorage.removeItem('cartState');
     
@@ -747,12 +911,31 @@ function goToHome() {
     window.location.href = 'index.html';
 }
 
-function redirectToCart() {
-    showToast('Your cart is empty. Redirecting to cart page...', 'error');
+function redirectToCart(message = 'Please complete your cart first') {
+    showToast(message, 'error');
     setTimeout(() => {
         window.location.href = 'cart.html';
     }, 2000);
 }
+
+// ===== ADD FLASH ANIMATION CSS =====
+const flashStyle = document.createElement('style');
+flashStyle.textContent = `
+    @keyframes flash {
+        0%, 100% { 
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+            transform: scale(1);
+            border-color: #dc2626;
+        }
+        50% { 
+            box-shadow: 0 0 30px rgba(220, 38, 38, 1);
+            transform: scale(1.02);
+            border-color: #b91c1c;
+            background: #fecaca !important;
+        }
+    }
+`;
+document.head.appendChild(flashStyle);
 
 // ===== EXPORT FUNCTIONS =====
 if (typeof window !== 'undefined') {
@@ -761,5 +944,4 @@ if (typeof window !== 'undefined') {
     window.continueShopping = continueShopping;
     window.goToHome = goToHome;
     window.copyUpiId = copyUpiId;
-    window.detectDeliveryArea = detectDeliveryArea;
 }

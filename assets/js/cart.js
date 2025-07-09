@@ -1,9 +1,18 @@
-// ===== CART PAGE JAVASCRIPT - ENHANCED VERSION =====
-let currentDeliveryArea = 'jodhpur';
+// ===== CART PAGE JAVASCRIPT - ENHANCED VERSION WITH PINCODE =====
+let currentDeliveryArea = null; // Start with null until pincode is entered
+let currentDeliveryOption = null; // normal or fasttrack for outside Jodhpur
+let selectedPincode = null; // Store selected pincode
 let appliedCouponData = null; // Store coupon details instead of just discount amount
 let removeItemId = null;
 
-// ===== UPDATED COUPON SYSTEM - 3 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
+// ===== JODHPUR PINCODES LIST =====
+const JODHPUR_PINCODES = [
+    // Main Jodhpur City
+    '342001', '342002', '342003', '342004', '342005', '342006', '342007', '342008', 
+    '342009', '342010', '342011', '342012', '342013', '342014', '342015', '342016',
+];
+
+// ===== UPDATED COUPON SYSTEM - 4 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
 const AVAILABLE_COUPONS = {
     'JODHPUR10': { 
         discount: 10, 
@@ -25,6 +34,13 @@ const AVAILABLE_COUPONS = {
         minOrder: 1500,
         description: 'Free mini puja thali on orders above ₹1500',
         gift: 'Mini Puja Thali'
+    },
+    'FREEDELIVERY': {
+        discount: 80,
+        type: 'delivery',
+        minOrder: 1200,
+        description: 'Free delivery (up to ₹80) on orders above ₹1200',
+        maxDiscount: 80
     },
     'VEDZZZ20': {
         discount: 20,
@@ -52,12 +68,259 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeCart() {
     loadCartItems();
-    setupDeliveryOptions();
+    setupPincodeInput(); // Setup pincode input first
+    restoreCartState(); // Restore previous state including pincode
     setupEventListeners();
-    restoreCartState(); // Restore coupon state
     updateCartSummary();
     loadRecommendedProducts();
-    displayEligibleCoupons(); // Show available coupons
+    
+    // Hide delivery options initially
+    hideDeliveryOptionsInitially();
+}
+
+// ===== HIDE DELIVERY OPTIONS INITIALLY =====
+function hideDeliveryOptionsInitially() {
+    const deliverySection = document.querySelector('.delivery-section');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    
+    if (!selectedPincode) {
+        if (deliverySection) {
+            deliverySection.style.display = 'none';
+        }
+        if (checkoutBtn) {
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML = '<span>Enter Pincode to Continue</span>';
+        }
+    }
+}
+
+// ===== SETUP PINCODE INPUT =====
+function setupPincodeInput() {
+    // Add pincode input section to cart summary if it doesn't exist
+    const summaryCard = document.querySelector('.summary-card');
+    if (summaryCard && !document.getElementById('pincodeSection')) {
+        const pincodeSection = document.createElement('div');
+        pincodeSection.id = 'pincodeSection';
+        pincodeSection.className = 'pincode-section';
+        pincodeSection.innerHTML = `
+            <h4><i class="fas fa-map-marker-alt"></i> Enter Delivery Pincode</h4>
+            <div class="pincode-input-group">
+                <input type="text" id="cartPincode" placeholder="Enter 6-digit pincode" maxlength="6" pattern="[0-9]{6}">
+                <button onclick="detectDeliveryFromPincode()" class="detect-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="pincode-message" id="pincodeMessage"></div>
+        `;
+        
+        // Insert before order summary
+        const orderSummaryRows = summaryCard.querySelector('.summary-row');
+        summaryCard.insertBefore(pincodeSection, orderSummaryRows);
+    }
+    
+    // Setup pincode input event listeners
+    const pincodeInput = document.getElementById('cartPincode');
+    if (pincodeInput) {
+        pincodeInput.addEventListener('input', function() {
+            const pincode = this.value.replace(/\D/g, ''); // Only allow digits
+            this.value = pincode;
+            
+            if (pincode.length === 6) {
+                detectDeliveryFromPincode();
+            } else {
+                clearDeliveryInfo();
+            }
+        });
+        
+        pincodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                detectDeliveryFromPincode();
+            }
+        });
+    }
+}
+
+// ===== DETECT DELIVERY FROM PINCODE =====
+function detectDeliveryFromPincode() {
+    const pincodeInput = document.getElementById('cartPincode');
+    const pincodeMessage = document.getElementById('pincodeMessage');
+    
+    if (!pincodeInput || !pincodeMessage) return;
+    
+    const pincode = pincodeInput.value.trim();
+    
+    if (!/^\d{6}$/.test(pincode)) {
+        showPincodeMessage('Please enter a valid 6-digit pincode', 'error');
+        clearDeliveryInfo();
+        return;
+    }
+    
+    // Store the pincode
+    selectedPincode = pincode;
+    localStorage.setItem('selectedPincode', pincode);
+    
+    // Check if it's Jodhpur
+    const isJodhpur = JODHPUR_PINCODES.includes(pincode);
+    currentDeliveryArea = isJodhpur ? 'jodhpur' : 'outside';
+    
+    if (isJodhpur) {
+        showPincodeMessage(`✅ Delivery within Jodhpur - ₹20`, 'success');
+        setupDeliveryOptionsJodhpur();
+    } else {
+        showPincodeMessage(`📦 Delivery outside Jodhpur - Choose delivery option`, 'info');
+        setupDeliveryOptionsOutside();
+    }
+    
+    // Save delivery area
+    localStorage.setItem('currentDeliveryArea', currentDeliveryArea);
+    
+    // Update summary and show delivery section
+    updateCartSummary();
+    displayEligibleCoupons();
+    
+    // Check coupon validity for new delivery area
+    if (appliedCouponData && appliedCouponData.deliveryArea && appliedCouponData.deliveryArea !== currentDeliveryArea) {
+        removeCoupon();
+        showToast('Coupon removed: Not valid for this delivery area', 'warning');
+    }
+}
+
+// ===== SETUP DELIVERY OPTIONS FOR JODHPUR =====
+function setupDeliveryOptionsJodhpur() {
+    const deliverySection = document.querySelector('.delivery-section');
+    if (deliverySection) {
+        deliverySection.style.display = 'block';
+        deliverySection.innerHTML = `
+            <h4>Delivery Options</h4>
+            <div class="delivery-options">
+                <label class="delivery-option selected">
+                    <input type="radio" name="delivery" value="jodhpur" checked>
+                    <span class="radio-mark"></span>
+                    <div class="delivery-info">
+                        <strong>Within Jodhpur</strong>
+                        <span class="delivery-time">1-2 business days</span>
+                        <span class="delivery-price">₹20</span>
+                    </div>
+                </label>
+            </div>
+        `;
+        currentDeliveryOption = 'jodhpur';
+    }
+    
+    enableCheckoutButton();
+}
+
+// ===== SETUP DELIVERY OPTIONS FOR OUTSIDE JODHPUR =====
+function setupDeliveryOptionsOutside() {
+    const deliverySection = document.querySelector('.delivery-section');
+    if (deliverySection) {
+        deliverySection.style.display = 'block';
+        deliverySection.innerHTML = `
+            <h4>Delivery Options</h4>
+            <div class="delivery-options">
+                <label class="delivery-option">
+                    <input type="radio" name="delivery" value="outside-normal">
+                    <span class="radio-mark"></span>
+                    <div class="delivery-info">
+                        <strong>Normal Delivery</strong>
+                        <span class="delivery-time">5-7 business days</span>
+                        <span class="delivery-price">₹60</span>
+                    </div>
+                </label>
+                <label class="delivery-option">
+                    <input type="radio" name="delivery" value="outside-fasttrack">
+                    <span class="radio-mark"></span>
+                    <div class="delivery-info">
+                        <strong>Fast Track Delivery</strong>
+                        <span class="delivery-time">3-4 business days</span>
+                        <span class="delivery-price">₹200</span>
+                    </div>
+                </label>
+            </div>
+        `;
+        
+        // Setup event listeners for outside delivery options
+        const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
+        deliveryOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                currentDeliveryOption = this.value;
+                localStorage.setItem('currentDeliveryOption', currentDeliveryOption);
+                updateCartSummary();
+                enableCheckoutButton();
+                
+                // Update visual selection
+                document.querySelectorAll('.delivery-option').forEach(opt => opt.classList.remove('selected'));
+                this.closest('.delivery-option').classList.add('selected');
+            });
+        });
+        
+        // Select normal delivery by default
+        const normalOption = document.querySelector('input[value="outside-normal"]');
+        if (normalOption) {
+            normalOption.checked = true;
+            currentDeliveryOption = 'outside-normal';
+            normalOption.closest('.delivery-option').classList.add('selected');
+        }
+    }
+    
+    // Don't enable checkout until option is selected
+    disableCheckoutButton();
+}
+
+// ===== ENABLE/DISABLE CHECKOUT BUTTON =====
+function enableCheckoutButton() {
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn && selectedPincode && currentDeliveryOption) {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML = '<span>Proceed to Checkout</span><i class="fas fa-arrow-right"></i>';
+    }
+}
+
+function disableCheckoutButton() {
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<span>Select Delivery Option</span>';
+    }
+}
+
+// ===== CLEAR DELIVERY INFO =====
+function clearDeliveryInfo() {
+    currentDeliveryArea = null;
+    currentDeliveryOption = null;
+    selectedPincode = null;
+    
+    const deliverySection = document.querySelector('.delivery-section');
+    if (deliverySection) {
+        deliverySection.style.display = 'none';
+    }
+    
+    disableCheckoutButtonForPincode();
+    updateCartSummary();
+}
+
+function disableCheckoutButtonForPincode() {
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = true;
+        checkoutBtn.innerHTML = '<span>Enter Pincode to Continue</span>';
+    }
+}
+
+// ===== SHOW PINCODE MESSAGE =====
+function showPincodeMessage(message, type) {
+    const pincodeMessage = document.getElementById('pincodeMessage');
+    if (pincodeMessage) {
+        pincodeMessage.textContent = message;
+        pincodeMessage.className = `pincode-message ${type}`;
+        pincodeMessage.style.display = 'block';
+        
+        setTimeout(() => {
+            if (type !== 'success' && type !== 'info') {
+                pincodeMessage.style.display = 'none';
+            }
+        }, 5000);
+    }
 }
 
 // ===== LOAD CART ITEMS =====
@@ -94,9 +357,9 @@ function createCartItem(item) {
                 <h4>${item.name}</h4>
                 <p>${item.category}</p>
                 <div class="cart-item-price">
-    ${formatPrice(item.price)}
-    <div class="price-note">Per piece</div>
-</div>
+                    ${formatPrice(item.price)}
+                    <div class="price-note">Per piece</div>
+                </div>
                 ${maxStock <= 5 ? `<div class="low-stock" style="color: #f59e0b; font-size: 0.8rem; margin-top: 4px;">Only ${maxStock} left in stock!</div>` : ''}
             </div>
             <div class="quantity-controls">
@@ -119,95 +382,20 @@ function createCartItem(item) {
     `;
 }
 
-// ===== QUANTITY MANAGEMENT (STOCK-BASED LIMITS) =====
-function decreaseQuantity(productId) {
-    const item = cart.find(item => item.id === productId);
-    if (item && item.quantity > 1) {
-        item.quantity -= 1;
-        updateCartData();
-    }
-}
-
-function increaseQuantity(productId) {
-    const item = cart.find(item => item.id === productId);
-    const maxStock = item.stock || 10; // Use stock from item, fallback to 10
+// ===== CALCULATE DELIVERY CHARGE =====
+function getDeliveryCharge() {
+    if (!currentDeliveryArea || !currentDeliveryOption) return 0;
     
-    if (item && item.quantity < maxStock) {
-        item.quantity += 1;
-        updateCartData();
-    } else if (item) {
-        showToast(`Only ${maxStock} items available in stock`, 'error');
-    }
-}
-
-function updateQuantity(productId, newQuantity) {
-    const quantity = parseInt(newQuantity);
-    const item = cart.find(item => item.id === productId);
-    
-    if (!item) {
-        showToast('Product not found in cart', 'error');
-        loadCartItems();
-        return;
-    }
-    
-    const maxStock = item.stock || 10; // Use stock from item, fallback to 10
-    
-    if (isNaN(quantity) || quantity < 1) {
-        showToast('Invalid quantity', 'error');
-        loadCartItems(); // Reset to original values
-        return;
-    }
-    
-    if (quantity > maxStock) {
-        showToast(`Only ${maxStock} items available in stock`, 'error');
-        loadCartItems(); // Reset to original values
-        return;
-    }
-    
-    item.quantity = quantity;
-    updateCartData();
-}
-
-// ===== UPDATE CART DATA (WITH DYNAMIC DISCOUNT NOTIFICATION) =====
-function updateCartData() {
-    // Store previous discount for comparison
-    const previousDiscount = appliedCouponData ? calculateCurrentDiscount() : 0;
-    
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCount();
-    loadCartItems();
-    updateCartSummary();
-    displayEligibleCoupons(); // Update available coupons
-    
-    // Show notification if discount changed due to quantity change
-    if (appliedCouponData) {
-        const newDiscount = calculateCurrentDiscount();
-            
-        if (newDiscount !== previousDiscount && newDiscount > 0) {
-            showToast(`Discount updated to ${formatPrice(newDiscount)} based on new cart total`, 'success');
+    if (currentDeliveryArea === 'jodhpur') {
+        return 20;
+    } else {
+        if (currentDeliveryOption === 'outside-normal') {
+            return 60;
+        } else if (currentDeliveryOption === 'outside-fasttrack') {
+            return 200;
         }
     }
-    
-    showToast('Cart updated', 'success');
-}
-
-// ===== SETUP DELIVERY OPTIONS =====
-function setupDeliveryOptions() {
-    const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
-    
-    deliveryOptions.forEach(option => {
-        option.addEventListener('change', function() {
-            currentDeliveryArea = this.value;
-            updateCartSummary();
-            displayEligibleCoupons(); // Update available coupons based on delivery area
-            
-            // Check if current coupon is still valid
-            if (appliedCouponData && appliedCouponData.deliveryArea && appliedCouponData.deliveryArea !== currentDeliveryArea) {
-                removeCoupon();
-                showToast('Coupon removed: Not valid for selected delivery area', 'warning');
-            }
-        });
-    });
+    return 0;
 }
 
 // ===== CALCULATE CURRENT DISCOUNT =====
@@ -215,20 +403,29 @@ function calculateCurrentDiscount() {
     if (!appliedCouponData) return 0;
     
     const subtotal = getCartTotal();
+    const deliveryCharge = getDeliveryCharge();
     
     if (subtotal < appliedCouponData.minOrder) return 0;
+    
+    // Check delivery area requirement for coupon
+    if (appliedCouponData.deliveryArea && appliedCouponData.deliveryArea !== currentDeliveryArea) {
+        return 0;
+    }
     
     if (appliedCouponData.type === 'percentage') {
         const discount = Math.round((subtotal * appliedCouponData.discount) / 100);
         return appliedCouponData.maxDiscount ? Math.min(discount, appliedCouponData.maxDiscount) : discount;
     } else if (appliedCouponData.type === 'fixed') {
         return appliedCouponData.discount;
+    } else if (appliedCouponData.type === 'delivery') {
+        // For delivery discount, return the minimum of delivery charge or max discount
+        return Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
     }
     
     return 0; // For gift type coupons
 }
 
-// ===== UPDATE CART SUMMARY (WITH DYNAMIC DISCOUNT CALCULATION) =====
+// ===== UPDATE CART SUMMARY =====
 function updateCartSummary() {
     const itemCount = document.getElementById('itemCount');
     const subtotalElement = document.getElementById('subtotal');
@@ -244,22 +441,20 @@ function updateCartSummary() {
     // Calculate values
     const subtotal = getCartTotal();
     const itemsCount = getCartItemCount();
-    let delivery = 0;
+    const delivery = getDeliveryCharge();
     
-    if (currentDeliveryArea === 'jodhpur') {
-        delivery = 30;
-    } else {
-        delivery = 70; // Courier charges for outside Jodhpur
-    }
-    
-    // Calculate dynamic discount based on current cart total
+    // Calculate dynamic discount based on current cart total and delivery area
     const currentDiscount = calculateCurrentDiscount();
     
-    // Check if coupon should be removed due to minimum order not met
-    if (appliedCouponData && subtotal < appliedCouponData.minOrder) {
+    // Check if coupon should be removed due to minimum order not met or delivery area
+    if (appliedCouponData && (subtotal < appliedCouponData.minOrder || 
+        (appliedCouponData.deliveryArea && appliedCouponData.deliveryArea !== currentDeliveryArea))) {
         appliedCouponData = null;
         localStorage.removeItem('appliedCoupon');
-        showToast(`Coupon removed: Order total below minimum requirement`, 'warning');
+        
+        if (subtotal < appliedCouponData?.minOrder) {
+            showToast(`Coupon removed: Order total below minimum requirement`, 'warning');
+        }
     }
     
     const total = subtotal + delivery - currentDiscount;
@@ -268,8 +463,17 @@ function updateCartSummary() {
     if (itemCount) itemCount.textContent = itemsCount;
     if (subtotalElement) subtotalElement.textContent = formatPrice(subtotal);
     if (deliveryCharges) {
-        deliveryCharges.textContent = currentDeliveryArea === 'jodhpur' ? 
-            formatPrice(delivery) : formatPrice(delivery) + ' (Courier)';
+        if (delivery > 0) {
+            let deliveryText = formatPrice(delivery);
+            if (currentDeliveryOption === 'outside-normal') {
+                deliveryText += ' (Normal)';
+            } else if (currentDeliveryOption === 'outside-fasttrack') {
+                deliveryText += ' (Fast Track)';
+            }
+            deliveryCharges.textContent = deliveryText;
+        } else {
+            deliveryCharges.textContent = 'Enter pincode';
+        }
     }
     if (totalAmount) {
         totalAmount.textContent = formatPrice(total);
@@ -278,8 +482,17 @@ function updateCartSummary() {
     // Update checkout page elements (if present)
     if (orderSubtotal) orderSubtotal.textContent = formatPrice(subtotal);
     if (orderDelivery) {
-        orderDelivery.textContent = currentDeliveryArea === 'jodhpur' ? 
-            formatPrice(delivery) : formatPrice(delivery) + ' (Courier)';
+        if (delivery > 0) {
+            let deliveryText = formatPrice(delivery);
+            if (currentDeliveryOption === 'outside-normal') {
+                deliveryText += ' (Normal)';
+            } else if (currentDeliveryOption === 'outside-fasttrack') {
+                deliveryText += ' (Fast Track)';
+            }
+            orderDelivery.textContent = deliveryText;
+        } else {
+            orderDelivery.textContent = 'TBD';
+        }
     }
     if (orderTotal) {
         orderTotal.textContent = formatPrice(total);
@@ -293,6 +506,8 @@ function updateCartSummary() {
                 let discountText = '-' + formatPrice(currentDiscount);
                 if (appliedCouponData.type === 'gift') {
                     discountText = `FREE: ${appliedCouponData.gift}`;
+                } else if (appliedCouponData.type === 'delivery') {
+                    discountText = `FREE DELIVERY: -${formatPrice(currentDiscount)}`;
                 }
                 discountAmount.textContent = discountText;
             }
@@ -306,28 +521,25 @@ function updateCartSummary() {
             if (couponInputMobile && appliedCouponData) {
                 couponInputMobile.value = appliedCouponData.code;
             }
-            
-            console.log('Cart: Showing dynamic discount:', currentDiscount, 'from coupon:', appliedCouponData.code);
         } else {
             discountRow.style.display = 'none';
-            console.log('Cart: Hiding discount row, discount:', currentDiscount);
         }
-    }
-    
-    // Update checkout button state
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    if (checkoutBtn) {
-        checkoutBtn.disabled = cart.length === 0;
     }
 }
 
-// ===== DISPLAY ELIGIBLE COUPONS (ONLY SHOW IF ELIGIBLE) =====
+// ===== DISPLAY ELIGIBLE COUPONS (MOBILE ONLY) =====
 function displayEligibleCoupons() {
     const subtotal = getCartTotal();
     const eligibleCoupons = getEligibleCoupons(subtotal, currentDeliveryArea);
     
-    // Create coupon suggestions section if it doesn't exist
-    let couponSuggestions = document.getElementById('couponSuggestions');
+    // Only show coupon suggestions on mobile (screen width <= 768px)
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // Mobile coupon suggestions
+        updateCouponSuggestions(eligibleCoupons, 'couponSuggestionsMobile', '.coupon-section-mobile');
+    } else {
+         let couponSuggestions = document.getElementById('couponSuggestions');
     if (!couponSuggestions && eligibleCoupons.length > 0) {
         couponSuggestions = document.createElement('div');
         couponSuggestions.id = 'couponSuggestions';
@@ -354,13 +566,45 @@ function displayEligibleCoupons() {
             couponList.innerHTML = eligibleCoupons.map(createCouponCard).join('');
         }
     }
+    }
+}
+
+function updateCouponSuggestions(eligibleCoupons, suggestionsId, sectionSelector) {
+    // Create coupon suggestions section if it doesn't exist
+    let couponSuggestions = document.getElementById(suggestionsId);
+    if (!couponSuggestions && eligibleCoupons.length > 0) {
+        couponSuggestions = document.createElement('div');
+        couponSuggestions.id = suggestionsId;
+        couponSuggestions.className = 'coupon-suggestions';
+        couponSuggestions.innerHTML = `
+            <h4>🎉 Special Offers Available!</h4>
+            <div class="coupon-list" id="${suggestionsId}List"></div>
+        `;
+        
+        // Insert after coupon input section
+        const couponSection = document.querySelector(sectionSelector);
+        if (couponSection) {
+            couponSection.parentNode.insertBefore(couponSuggestions, couponSection.nextSibling);
+        }
+    }
+    
+    // Update coupon list
+    const couponList = document.getElementById(suggestionsId + 'List');
+    if (couponList) {
+        if (eligibleCoupons.length === 0) {
+            if (couponSuggestions) couponSuggestions.style.display = 'none';
+        } else {
+            if (couponSuggestions) couponSuggestions.style.display = 'block';
+            couponList.innerHTML = eligibleCoupons.map(coupon => createCouponCard(coupon, suggestionsId.includes('Mobile'))).join('');
+        }
+    }
 }
 
 function getEligibleCoupons(subtotal, deliveryArea) {
     const eligible = [];
 
     Object.entries(AVAILABLE_COUPONS).forEach(([code, coupon]) => {
-        if (coupon.hidden) return; // ✅ Skip hidden coupons
+        if (coupon.hidden) return; // Skip hidden coupons
 
         if (appliedCouponData && appliedCouponData.code === code) return;
         if (coupon.deliveryArea && coupon.deliveryArea !== deliveryArea) return;
@@ -372,7 +616,7 @@ function getEligibleCoupons(subtotal, deliveryArea) {
     return eligible;
 }
 
-function createCouponCard(coupon) {
+function createCouponCard(coupon, isMobile = false) {
     let savings = '';
     let icon = '💰';
     
@@ -385,10 +629,17 @@ function createCouponCard(coupon) {
     } else if (coupon.type === 'fixed') {
         savings = `Save ${formatPrice(coupon.discount)}`;
         icon = '💰';
+    } else if (coupon.type === 'delivery') {
+        const deliveryCharge = getDeliveryCharge();
+        const actualSavings = Math.min(deliveryCharge, coupon.maxDiscount || coupon.discount);
+        savings = `Save ${formatPrice(actualSavings)} on delivery`;
+        icon = '🚚';
     } else if (coupon.type === 'gift') {
         savings = `Get ${coupon.gift} FREE`;
         icon = '🎁';
     }
+    
+    const functionName = isMobile ? 'quickApplyCouponMobile' : 'quickApplyCoupon';
     
     return `
         <div class="coupon-card-suggestion">
@@ -400,74 +651,110 @@ function createCouponCard(coupon) {
                 <div class="coupon-description">${coupon.description}</div>
                 <div class="coupon-savings">${savings}</div>
             </div>
-            <button class="apply-coupon-quick" onclick="quickApplyCoupon('${coupon.code}')">
+            <button class="apply-coupon-quick" onclick="${functionName}('${coupon.code}')">
                 Apply Now
             </button>
         </div>
     `;
 }
 
-// ===== SETUP EVENT LISTENERS =====
-function setupEventListeners() {
-    // Close remove modal when clicking outside
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal')) {
-            closeRemoveModal();
-        }
-    });
-}
-
-// ===== REMOVE ITEM FUNCTIONALITY =====
-function showRemoveConfirmation(productId) {
-    removeItemId = productId;
-    showModal('removeModal');
-}
-
-function confirmRemoveItem() {
-    if (removeItemId) {
-        removeFromCart(removeItemId);
-        updateCartData();
-        closeRemoveModal();
-        showToast('Item removed from cart', 'success');
-        removeItemId = null;
-        
-        // Check if cart is empty
-        if (cart.length === 0) {
-            const emptyCart = document.getElementById('emptyCart');
-            const cartContent = document.getElementById('cartContent');
-            if (emptyCart) emptyCart.style.display = 'flex';
-            if (cartContent) cartContent.style.display = 'none';
-        }
-    }
-}
-
-function closeRemoveModal() {
-    hideModal('removeModal');
-    removeItemId = null;
-}
-
-// ===== CLEAR CART =====
-function clearCart() {
+// ===== PROCEED TO CHECKOUT WITH VALIDATION =====
+function proceedToCheckout() {
     if (cart.length === 0) {
-        showToast('Cart is already empty', 'error');
+        showToast('Your cart is empty', 'error');
         return;
     }
     
-    if (confirm('Are you sure you want to clear all items from your cart?')) {
-        cart = [];
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartCount();
+    if (!selectedPincode) {
+        showToast('Please enter your delivery pincode', 'error');
+        const pincodeInput = document.getElementById('cartPincode');
+        if (pincodeInput) pincodeInput.focus();
+        return;
+    }
+    
+    if (!currentDeliveryOption) {
+        showToast('Please select a delivery option', 'error');
+        return;
+    }
+    
+    // Save all delivery data for checkout
+    const deliveryData = {
+        pincode: selectedPincode,
+        area: currentDeliveryArea,
+        option: currentDeliveryOption,
+        charge: getDeliveryCharge()
+    };
+    
+    localStorage.setItem('deliveryData', JSON.stringify(deliveryData));
+    
+    if (appliedCouponData) {
+        localStorage.setItem('appliedCoupon', JSON.stringify(appliedCouponData));
+    }
+    
+    window.location.href = 'checkout.html';
+}
+
+// ===== SAVE AND RESTORE CART STATE =====
+function saveCartState() {
+    const cartState = {
+        items: cart,
+        pincode: selectedPincode,
+        deliveryArea: currentDeliveryArea,
+        deliveryOption: currentDeliveryOption,
+        coupon: appliedCouponData,
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem('cartState', JSON.stringify(cartState));
+}
+
+function restoreCartState() {
+    try {
+        // Restore applied coupon from localStorage
+        const couponData = localStorage.getItem('appliedCoupon');
+        if (couponData) {
+            const parsedCoupon = JSON.parse(couponData);
+            if (parsedCoupon.type && parsedCoupon.minOrder !== undefined) {
+                appliedCouponData = parsedCoupon;
+            }
+        }
         
-        // Clear applied coupons
-        appliedCouponData = null;
-        localStorage.removeItem('appliedCoupon');
+        // Restore pincode and delivery data
+        selectedPincode = localStorage.getItem('selectedPincode');
+        currentDeliveryArea = localStorage.getItem('currentDeliveryArea');
+        currentDeliveryOption = localStorage.getItem('currentDeliveryOption');
         
-        const emptyCart = document.getElementById('emptyCart');
-        const cartContent = document.getElementById('cartContent');
-        if (emptyCart) emptyCart.style.display = 'flex';
-        if (cartContent) cartContent.style.display = 'none';
+        // Update UI if pincode exists
+        if (selectedPincode) {
+            const pincodeInput = document.getElementById('cartPincode');
+            if (pincodeInput) {
+                pincodeInput.value = selectedPincode;
+            }
+            
+            // Setup delivery options based on stored data
+            if (currentDeliveryArea === 'jodhpur') {
+                setupDeliveryOptionsJodhpur();
+                showPincodeMessage(`✅ Delivery within Jodhpur - ₹20`, 'success');
+            } else if (currentDeliveryArea === 'outside') {
+                setupDeliveryOptionsOutside();
+                showPincodeMessage(`📦 Delivery outside Jodhpur - Choose delivery option`, 'info');
+                
+                // Restore selected delivery option
+                setTimeout(() => {
+                    if (currentDeliveryOption) {
+                        const option = document.querySelector(`input[value="${currentDeliveryOption}"]`);
+                        if (option) {
+                            option.checked = true;
+                            option.closest('.delivery-option').classList.add('selected');
+                            enableCheckoutButton();
+                        }
+                    }
+                }, 100);
+            }
+        }
         
-        showToast('Cart cleared successfully', 'success');
+    } catch (error) {
+        console.error('Error restoring cart state:', error);
     }
 }
 
@@ -531,7 +818,10 @@ function applyCouponLogic(code, messageCallback) {
         if (coupon.hidden) {
             messageText = `🔖Coupon applied! ${coupon.description}: ${formatPrice(currentDiscount)}.`, 'info';
         }
-    } else if (coupon.type === 'fixed') {
+    } else if (coupon.type === 'delivery') {
+        const currentDiscount = calculateCurrentDiscount();
+        messageText = `🚚 Coupon applied! Free delivery - You saved ${formatPrice(currentDiscount)}`;
+    }else if (coupon.type === 'fixed') {
         messageText = `🎉 Coupon applied! You saved ${formatPrice(coupon.discount)}`;
     } else if (coupon.type === 'gift') {
         messageText = `🎁 Coupon applied! You get a FREE ${coupon.gift}`;
@@ -563,6 +853,21 @@ function quickApplyCoupon(code) {
     }
 }
 
+function quickApplyCouponMobile(code) {
+    const couponInputMobile = document.getElementById('couponCodeMobile');
+    
+    if (couponInputMobile) {
+        couponInputMobile.value = code;
+        applyCouponLogic(code, showCouponMessageMobile);
+    }
+    
+    // Also sync with desktop
+    const couponInput = document.getElementById('couponCode');
+    if (couponInput) {
+        couponInput.value = code;
+    }
+}
+
 function showCouponMessage(message, type) {
     const couponMessage = document.getElementById('couponMessage');
     if (couponMessage) {
@@ -576,106 +881,133 @@ function showCouponMessage(message, type) {
     }
 }
 
-// ===== REMOVE COUPON FUNCTIONALITY (DYNAMIC) =====
-function removeCoupon() {
-    appliedCouponData = null;
-    localStorage.removeItem('appliedCoupon');
-    
-    const couponInput = document.getElementById('couponCode');
-    const couponInputMobile = document.getElementById('couponCodeMobile');
-    if (couponInput) {
-        couponInput.value = '';
+// ===== QUANTITY MANAGEMENT =====
+function decreaseQuantity(productId) {
+    const item = cart.find(item => item.id === productId);
+    if (item && item.quantity > 1) {
+        item.quantity -= 1;
+        updateCartData();
     }
-    if (couponInputMobile) {
-        couponInputMobile.value = '';
-    }
-    
-    updateCartSummary();
-    displayEligibleCoupons(); // Refresh available coupons
-    showCouponMessage('Coupon removed', 'success');
-    console.log('Coupon removed - dynamic discount reset');
 }
 
-// ===== PROCEED TO CHECKOUT (WITH DYNAMIC COUPON DATA) =====
-function proceedToCheckout() {
-    if (cart.length === 0) {
-        showToast('Your cart is empty', 'error');
+function increaseQuantity(productId) {
+    const item = cart.find(item => item.id === productId);
+    const maxStock = item.stock || 10;
+    
+    if (item && item.quantity < maxStock) {
+        item.quantity += 1;
+        updateCartData();
+    } else if (item) {
+        showToast(`Only ${maxStock} items available in stock`, 'error');
+    }
+}
+
+function updateQuantity(productId, newQuantity) {
+    const quantity = parseInt(newQuantity);
+    const item = cart.find(item => item.id === productId);
+    
+    if (!item) {
+        showToast('Product not found in cart', 'error');
+        loadCartItems();
         return;
     }
     
-    // Save current delivery area and coupon data
-    localStorage.setItem('selectedDeliveryArea', currentDeliveryArea);
-    if (appliedCouponData) {
-        localStorage.setItem('appliedCoupon', JSON.stringify(appliedCouponData));
-        console.log('Saving coupon data for checkout:', appliedCouponData);
+    const maxStock = item.stock || 10;
+    
+    if (isNaN(quantity) || quantity < 1) {
+        showToast('Invalid quantity', 'error');
+        loadCartItems();
+        return;
     }
     
-    window.location.href = 'checkout.html';
+    if (quantity > maxStock) {
+        showToast(`Only ${maxStock} items available in stock`, 'error');
+        loadCartItems();
+        return;
+    }
+    
+    item.quantity = quantity;
+    updateCartData();
 }
 
-// ===== LOAD RECOMMENDED PRODUCTS (WITH STOCK) =====
-function loadRecommendedProducts() {
-    const recommendedContainer = document.getElementById('recommendedProducts');
-    const recentlyViewedSection = document.getElementById('recentlyViewed');
+// ===== UPDATE CART DATA =====
+function updateCartData() {
+    const previousDiscount = appliedCouponData ? calculateCurrentDiscount() : 0;
     
-    if (!recommendedContainer) return;
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    loadCartItems();
+    updateCartSummary();
+    displayEligibleCoupons();
     
-    // Get categories from cart items
-    const cartCategories = [...new Set(cart.map(item => item.category))];
-    
-    // Sample products for recommendations
-    const sampleProducts = [
-        {
-            id: 'rec-001',
-            name: 'Golden Thread Rakhi',
-            price: 149,
-            image: 'https://images.unsplash.com/photo-1628191081813-a97dd6f46ae8?w=400&h=400&fit=crop&crop=center',
-            category: 'Thread',
-            stock: 20
-        },
-        {
-            id: 'rec-002',
-            name: 'Silver Om Rakhi',
-            price: 399,
-            image: 'https://images.unsplash.com/photo-1606407762584-d681bf2167e3?w=400&h=400&fit=crop&crop=center',
-            category: 'Silver',
-            stock: 8
-        },
-        {
-            id: 'rec-003',
-            name: 'Kids Cartoon Rakhi',
-            price: 99,
-            image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=400&fit=crop&crop=center',
-            category: 'Kids',
-            stock: 15
+    if (appliedCouponData) {
+        const newDiscount = calculateCurrentDiscount();
+        if (newDiscount !== previousDiscount && newDiscount > 0) {
+            showToast(`Discount updated to ${formatPrice(newDiscount)} based on new cart total`, 'success');
         }
-    ];
+    }
     
-    if (sampleProducts.length > 0) {
-        recommendedContainer.innerHTML = sampleProducts.map(product => `
-            <div class="product-card small">
-                <div class="product-image">
-                    <img src="${product.image}" alt="${product.name}" loading="lazy">
-                </div>
-                <div class="product-info">
-                    <div class="product-category">${product.category}</div>
-                    <h4 class="product-title">${product.name}</h4>
-                    <div class="product-price">${formatPrice(product.price)}</div>
-                    <button class="add-to-cart-btn small" onclick="addToCart('${product.id}', '${product.name}', '${product.price}', '${product.image}', '${product.category}', '${product.stock}')">
-                        <i class="fas fa-plus"></i>
-                        Add
-                    </button>
-                </div>
-            </div>
-        `).join('');
+    showToast('Cart updated', 'success');
+}
+
+// ===== SETUP EVENT LISTENERS =====
+function setupEventListeners() {
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            closeRemoveModal();
+        }
+    });
+}
+
+// ===== REMOVE ITEM FUNCTIONALITY =====
+function showRemoveConfirmation(productId) {
+    removeItemId = productId;
+    showModal('removeModal');
+}
+
+function confirmRemoveItem() {
+    if (removeItemId) {
+        removeFromCart(removeItemId);
+        updateCartData();
+        closeRemoveModal();
+        showToast('Item removed from cart', 'success');
+        removeItemId = null;
         
-        if (recentlyViewedSection) {
-            recentlyViewedSection.style.display = 'block';
+        if (cart.length === 0) {
+            const emptyCart = document.getElementById('emptyCart');
+            const cartContent = document.getElementById('cartContent');
+            if (emptyCart) emptyCart.style.display = 'flex';
+            if (cartContent) cartContent.style.display = 'none';
         }
-    } else {
-        if (recentlyViewedSection) {
-            recentlyViewedSection.style.display = 'none';
-        }
+    }
+}
+
+function closeRemoveModal() {
+    hideModal('removeModal');
+    removeItemId = null;
+}
+
+// ===== CLEAR CART =====
+function clearCart() {
+    if (cart.length === 0) {
+        showToast('Cart is already empty', 'error');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to clear all items from your cart?')) {
+        cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        
+        appliedCouponData = null;
+        localStorage.removeItem('appliedCoupon');
+        
+        const emptyCart = document.getElementById('emptyCart');
+        const cartContent = document.getElementById('cartContent');
+        if (emptyCart) emptyCart.style.display = 'flex';
+        if (cartContent) cartContent.style.display = 'none';
+        
+        showToast('Cart cleared successfully', 'success');
     }
 }
 
@@ -684,120 +1016,13 @@ function continueShopping() {
     window.location.href = 'shop.html';
 }
 
-// ===== CART ANIMATIONS =====
-function animateCartUpdate() {
-    const cartItems = document.querySelectorAll('.cart-item');
-    cartItems.forEach((item, index) => {
-        item.style.animation = 'none';
-        setTimeout(() => {
-            item.style.animation = 'slideIn 0.3s ease forwards';
-        }, index * 100);
-    });
-}
-
-// ===== VALIDATE CART BEFORE CHECKOUT (WITH STOCK VALIDATION) =====
-function validateCartForCheckout() {
-    if (cart.length === 0) {
-        showToast('Your cart is empty', 'error');
-        return false;
-    }
-    
-    // Check for any invalid quantities or stock issues
-    for (let item of cart) {
-        const maxStock = item.stock || 10;
-        
-        if (!item.quantity || item.quantity <= 0) {
-            showToast('Please check item quantities', 'error');
-            return false;
-        }
-        
-        if (item.quantity > maxStock) {
-            showToast(`${item.name}: Only ${maxStock} items available in stock`, 'error');
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-// ===== LOCAL STORAGE MANAGEMENT =====
-function syncCartWithLocalStorage() {
-    try {
-        const storedCart = localStorage.getItem('cart');
-        if (storedCart) {
-            cart = JSON.parse(storedCart);
-        }
-    } catch (error) {
-        console.error('Error syncing cart with localStorage:', error);
-        cart = [];
-    }
-}
-
-// ===== RESPONSIVE CART DISPLAY =====
-function adjustCartDisplay() {
-    const isMobile = window.innerWidth <= 768;
-    const cartItems = document.querySelectorAll('.cart-item');
-    
-    cartItems.forEach(item => {
-        if (isMobile) {
-            item.classList.add('mobile-layout');
-        } else {
-            item.classList.remove('mobile-layout');
-        }
-    });
-}
-
-// Adjust display on window resize
-window.addEventListener('resize', debounce(adjustCartDisplay, 250));
-
-// ===== CART PERSISTENCE (WITH DYNAMIC COUPON DATA) =====
-function saveCartState() {
-    const cartState = {
-        items: cart,
-        deliveryArea: currentDeliveryArea,
-        coupon: appliedCouponData, // Save full coupon data for dynamic calculation
-        timestamp: Date.now()
-    };
-    
-    localStorage.setItem('cartState', JSON.stringify(cartState));
-}
-
-function restoreCartState() {
-    try {
-        // Restore applied coupon from localStorage
-        const couponData = localStorage.getItem('appliedCoupon');
-        if (couponData) {
-            const parsedCoupon = JSON.parse(couponData);
-            // Check if it's new format with all required properties
-            if (parsedCoupon.type && parsedCoupon.minOrder !== undefined) {
-                appliedCouponData = parsedCoupon;
-                console.log('Restored dynamic coupon data:', appliedCouponData);
-            } else {
-                // Old format - remove it
-                localStorage.removeItem('appliedCoupon');
-                appliedCouponData = null;
-                console.log('Removed old format coupon data');
-            }
-        }
-        
-        const cartState = localStorage.getItem('cartState');
-        if (cartState) {
-            const state = JSON.parse(cartState);
-            
-            // Check if cart state is not too old (24 hours)
-            const hoursSinceUpdate = (Date.now() - state.timestamp) / (1000 * 60 * 60);
-            if (hoursSinceUpdate < 24) {
-                currentDeliveryArea = state.deliveryArea || 'jodhpur';
-            }
-        }
-    } catch (error) {
-        console.error('Error restoring cart state:', error);
-        appliedCouponData = null;
-    }
-}
-
 // Save cart state when page unloads
 window.addEventListener('beforeunload', saveCartState);
+
+// Handle window resize for mobile coupon suggestions
+window.addEventListener('resize', debounce(() => {
+    displayEligibleCoupons();
+}, 250));
 
 // ===== EXPORT FUNCTIONS =====
 if (typeof window !== 'undefined') {
@@ -810,133 +1035,9 @@ if (typeof window !== 'undefined') {
     window.clearCart = clearCart;
     window.applyCoupon = applyCoupon;
     window.applyCouponLogic = applyCouponLogic;
-    window.removeCoupon = removeCoupon;
     window.quickApplyCoupon = quickApplyCoupon;
+    window.quickApplyCouponMobile = quickApplyCouponMobile;
     window.proceedToCheckout = proceedToCheckout;
     window.continueShopping = continueShopping;
+    window.detectDeliveryFromPincode = detectDeliveryFromPincode;
 }
-
-// ===== ADD ENHANCED COUPON SUGGESTION STYLES =====
-const couponStyles = document.createElement('style');
-couponStyles.textContent = `
-    .coupon-suggestions {
-        background: linear-gradient(135deg, #fef3c7, #fed7aa);
-        border-radius: var(--border-radius);
-        padding: 25px;
-        margin: 20px 0;
-        border: 2px solid var(--primary-gold);
-        animation: glow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes glow {
-        from { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
-        to { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
-    }
-    
-    .coupon-suggestions h4 {
-        color: var(--dark-gray);
-        font-size: 1.3rem;
-        font-weight: 600;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    
-    .coupon-list {
-        display: grid;
-        gap: 15px;
-    }
-    
-    .coupon-card-suggestion {
-        background: white;
-        border-radius: 12px;
-        padding: 18px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid var(--primary-red);
-        transition: all 0.3s ease;
-    }
-    
-    .coupon-card-suggestion:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-    
-    .coupon-info {
-        flex: 1;
-    }
-    
-    .coupon-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 6px;
-    }
-    
-    .coupon-icon {
-        font-size: 1.2rem;
-    }
-    
-    .coupon-code {
-        font-weight: 700;
-        color: var(--primary-red);
-        font-size: 1.1rem;
-        font-family: 'Courier New', monospace;
-    }
-    
-    .coupon-description {
-        color: var(--gray);
-        font-size: 0.9rem;
-        margin-bottom: 4px;
-        line-height: 1.3;
-    }
-    
-    .coupon-savings {
-        color: var(--primary-gold);
-        font-weight: 600;
-        font-size: 0.95rem;
-    }
-    
-    .apply-coupon-quick {
-        background: var(--primary-red);
-        color: white;
-        border: none;
-        padding: 10px 18px;
-        border-radius: 8px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-    }
-    
-    .apply-coupon-quick:hover {
-        background: var(--dark-red);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-    }
-    
-    @media (max-width: 768px) {
-        .coupon-suggestions {
-            padding: 20px;
-            margin: 15px 0;
-        }
-        
-        .coupon-card-suggestion {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 15px;
-        }
-        
-        .apply-coupon-quick {
-            width: 100%;
-            padding: 12px;
-        }
-        
-        .coupon-header {
-            justify-content: flex-start;
-        }
-    }
-`;
-document.head.appendChild(couponStyles);
