@@ -608,7 +608,7 @@ function getCategoryDisplayName(category) {
         'silver': 'Silver Rakhis',
         'kids': 'Kids Rakhis',
         'bhaiya-bhabhi': 'Bhaiya-Bhabhi Sets',
-        'kumkum-chawal': 'Kumkum Chawal Sets'
+        'sacred-accessories': 'Sacred Accessories'
     };
     return categoryNames[category] || category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
 }

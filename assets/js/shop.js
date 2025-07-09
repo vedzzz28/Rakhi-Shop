@@ -138,7 +138,7 @@ function getDefaultImage(category) {
         'silver': 'https://images.unsplash.com/photo-1606407762584-d681bf2167e3?w=400&h=400&fit=crop&crop=center',
         'kids': 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=400&fit=crop&crop=center',
         'bhaiya-bhabhi': 'https://images.unsplash.com/photo-1583275863106-e45f45bcd2b9?w=400&h=400&fit=crop&crop=center',
-        'kumkum-chawal': 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=400&fit=crop&crop=center',
+        'sacred-accessories': 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=400&fit=crop&crop=center',
         'thread': 'https://images.unsplash.com/photo-1628191081813-a97dd6f46ae8?w=400&h=400&fit=crop&crop=center',
         'lumba': 'https://images.unsplash.com/photo-1583275863106-e45f45bcd2b9?w=400&h=400&fit=crop&crop=center'
     };

@@ -17,42 +17,49 @@ const AVAILABLE_COUPONS = {
     'JODHPUR10': { 
         discount: 10, 
         type: 'percentage', 
-        minOrder: 0, 
+        minOrder: 500, 
         deliveryArea: 'jodhpur',
-        description: '10% off for delivery within Jodhpur',
+        description: 'FLAT 10% off for delivery within Jodhpur',
         maxDiscount: 10000
     },
-    'BIGORDER150': { 
-        discount: 150, 
+    'FESTIVAL9': { 
+        discount: 7.5, 
+        type: 'percentage', 
+        minOrder: 1700, 
+        description: '7.5% off (upto ₹150) for delivery orders above ₹1600',
+        maxDiscount: 150
+    },
+    'BIGORDER200': { 
+        discount: 200, 
         type: 'fixed', 
-        minOrder: 2000,
-        description: 'Flat ₹150 off on orders above ₹2000'
+        minOrder: 2100,
+        description: 'Flat ₹200 off on orders above ₹2100'
     },
     'PUJATHALI': { 
         discount: 0, 
         type: 'gift', 
-        minOrder: 1500,
-        description: 'Free mini puja thali on orders above ₹1500',
+        minOrder: 1200,
+        description: 'Free mini puja thali worth ₹75 on orders above ₹1200',
         gift: 'Mini Puja Thali'
     },
     'FREEDELIVERY': {
         discount: 80,
         type: 'delivery',
-        minOrder: 1200,
-        description: 'Free delivery (up to ₹80) on orders above ₹1200',
-        maxDiscount: 80
+        minOrder: 900,
+        description: 'Free delivery (up to ₹50) on orders above ₹900',
+        maxDiscount: 50
     },
-    'VEDZZZ20': {
+    'RATHI20': {
         discount: 20,
         type: 'percentage',
-        minOrder: 0,
+        minOrder: 500,
         hidden: true,
         description: '20% off (Exclusive)'
     },
     'VEDZZSP10': {
         discount: 25,
         type: 'percentage',
-        minOrder: 2000,
+        minOrder: 2200,
         hidden: true,
         deliveryArea: 'jodhpur',
         description: '25% off (Super Exclusive)'
