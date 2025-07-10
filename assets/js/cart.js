@@ -43,7 +43,7 @@ const AVAILABLE_COUPONS = {
         description: 'Free mini puja thali worth ₹70 on orders above ₹1000',
         gift: 'Mini Puja Thali'
     },
-    'FREEDELIVERY': {
+    'SHIPFREE35': {
         discount: 80,
         type: 'delivery',
         minOrder: 700,
