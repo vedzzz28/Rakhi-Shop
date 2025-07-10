@@ -47,8 +47,8 @@ const AVAILABLE_COUPONS = {
         discount: 80,
         type: 'delivery',
         minOrder: 700,
-        description: 'Free delivery (up to ₹50) on orders above ₹700',
-        maxDiscount: 50
+        description: 'Discount on Deliver (upto ₹35) on orders above ₹700',
+        maxDiscount: 35
     },
     'RATHI20': {
         discount: 20,
