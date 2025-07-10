@@ -1,4 +1,4 @@
-// ===== MAIN JAVASCRIPT FILE =====
+// ===== MAIN JAVASCRIPT FILE - FIXED STOCK HANDLING =====
 // Global variables
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -61,8 +61,25 @@ function updateCartCount() {
 }
 
 function addToCart(productId, productName, productPrice, productImage, productCategory, productStock) {
-    const stock = parseInt(productStock) || 10; // Default to 10 if stock not provided
+    // FIXED: Proper stock handling - only use default when stock is missing/empty/null
+    let stock;
+    if (productStock !== undefined && productStock !== null && productStock !== '') {
+        stock = parseInt(productStock);
+        // If parseInt returns NaN, use 10 as default
+        stock = isNaN(stock) ? 10 : stock;
+    } else {
+        stock = 10; // Default only when stock is missing/empty/null
+    }
+    
+    console.log(`Adding to cart: ${productName}, productStock param: ${productStock}, parsed stock: ${stock}`);
+    
     const existingItem = cart.find(item => item.id === productId);
+    
+    // Check if out of stock
+    if (stock <= 0) {
+        showToast('This item is out of stock', 'error');
+        return;
+    }
     
     if (existingItem) {
         if (existingItem.quantity >= stock) {
@@ -70,13 +87,8 @@ function addToCart(productId, productName, productPrice, productImage, productCa
             return;
         }
         existingItem.quantity += 1;
-        // Update stock info in existing item
-        existingItem.stock = stock;
+        existingItem.stock = stock; // Update stock in cart item
     } else {
-        if (stock <= 0) {
-            showToast('This item is out of stock', 'error');
-            return;
-        }
         cart.push({
             id: productId,
             name: productName,
@@ -101,7 +113,7 @@ function addToCart(productId, productName, productPrice, productImage, productCa
         
         setTimeout(() => {
             button.innerHTML = originalText;
-            button.disabled = false;
+            button.disabled = stock <= 0;
         }, 1500);
     }
 }

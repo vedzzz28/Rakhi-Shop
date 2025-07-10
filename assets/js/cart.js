@@ -1,4 +1,4 @@
-// ===== CART PAGE JAVASCRIPT - ENHANCED VERSION WITH PINCODE =====
+// ===== CART PAGE JAVASCRIPT - ENHANCED VERSION WITH PINCODE - FIXED STOCK HANDLING =====
 let currentDeliveryArea = null; // Start with null until pincode is entered
 let currentDeliveryOption = null; // normal or fasttrack for outside Jodhpur
 let selectedPincode = null; // Store selected pincode
@@ -14,55 +14,55 @@ const JODHPUR_PINCODES = [
 
 // ===== UPDATED COUPON SYSTEM - 4 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
 const AVAILABLE_COUPONS = {
-    'JODHPUR10': { 
-        discount: 10, 
+    'JODHPUR15': { 
+        discount: 15, 
         type: 'percentage', 
-        minOrder: 500, 
+        minOrder: 300, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 10% off for delivery within Jodhpur',
-        maxDiscount: 10000
+        description: 'FLAT 15% off for delivery within Jodhpur',
+        maxDiscount: 5000,
+        expiryDate: '2025-07-20'
     },
     'FESTIVAL9': { 
         discount: 7.5, 
         type: 'percentage', 
-        minOrder: 1700, 
-        description: '7.5% off (upto ₹150) for delivery orders above ₹1600',
-        maxDiscount: 150
+        minOrder: 1500, 
+        description: '7.5% off (upto ₹135) on orders above ₹1500',
+        maxDiscount: 135
     },
     'BIGORDER200': { 
         discount: 200, 
         type: 'fixed', 
-        minOrder: 2100,
-        description: 'Flat ₹200 off on orders above ₹2100'
+        minOrder: 2000,
+        description: 'Flat ₹200 off on orders above ₹2000'
     },
     'PUJATHALI': { 
         discount: 0, 
         type: 'gift', 
-        minOrder: 1200,
-        description: 'Free mini puja thali worth ₹75 on orders above ₹1200',
+        minOrder: 1000,
+        description: 'Free mini puja thali worth ₹70 on orders above ₹1000',
         gift: 'Mini Puja Thali'
     },
     'FREEDELIVERY': {
         discount: 80,
         type: 'delivery',
-        minOrder: 900,
-        description: 'Free delivery (up to ₹50) on orders above ₹900',
+        minOrder: 700,
+        description: 'Free delivery (up to ₹50) on orders above ₹700',
         maxDiscount: 50
     },
     'RATHI20': {
         discount: 20,
         type: 'percentage',
-        minOrder: 500,
+        minOrder: 400,
         hidden: true,
-        description: '20% off (Exclusive)'
+        description: 'FLAT 20% off on orders above 400(Exclusive)'
     },
     'VEDZZSP10': {
         discount: 25,
         type: 'percentage',
-        minOrder: 2200,
+        minOrder: 1400,
         hidden: true,
-        deliveryArea: 'jodhpur',
-        description: '25% off (Super Exclusive)'
+        description: 'FLAT 25% off on order above 1400 (Super Exclusive)'
     }
 };
 
@@ -217,7 +217,6 @@ function setupDeliveryOptionsJodhpur() {
     enableCheckoutButton();
 }
 
-// ===== SETUP DELIVERY OPTIONS FOR OUTSIDE JODHPUR =====
 function setupDeliveryOptionsOutside() {
     const deliverySection = document.querySelector('.delivery-section');
     if (deliverySection) {
@@ -231,7 +230,7 @@ function setupDeliveryOptionsOutside() {
                     <div class="delivery-info">
                         <strong>Normal Delivery</strong>
                         <span class="delivery-time">5-7 business days</span>
-                        <span class="delivery-price">₹60</span>
+                        <span class="delivery-price">₹50</span>
                     </div>
                 </label>
                 <label class="delivery-option">
@@ -240,7 +239,7 @@ function setupDeliveryOptionsOutside() {
                     <div class="delivery-info">
                         <strong>Fast Track Delivery</strong>
                         <span class="delivery-time">3-4 business days</span>
-                        <span class="delivery-price">₹200</span>
+                        <span class="delivery-price">₹150</span>
                     </div>
                 </label>
             </div>
@@ -261,16 +260,12 @@ function setupDeliveryOptionsOutside() {
             });
         });
         
-        // Select normal delivery by default
-        const normalOption = document.querySelector('input[value="outside-normal"]');
-        if (normalOption) {
-            normalOption.checked = true;
-            currentDeliveryOption = 'outside-normal';
-            normalOption.closest('.delivery-option').classList.add('selected');
-        }
+        // REMOVED: No automatic selection - user must choose
+        // Reset currentDeliveryOption to null so user must select
+        currentDeliveryOption = null;
     }
     
-    // Don't enable checkout until option is selected
+    // Keep checkout button disabled until option is selected
     disableCheckoutButton();
 }
 
@@ -350,10 +345,19 @@ function loadCartItems() {
     }
 }
 
-// ===== CREATE CART ITEM HTML (WITH STOCK LIMITS) =====
+// ===== CREATE CART ITEM HTML (WITH STOCK LIMITS) - FIXED STOCK HANDLING =====
 function createCartItem(item) {
     const subtotal = item.price * item.quantity;
-    const maxStock = item.stock || 10; // Use stock from item, fallback to 10
+    // FIXED: Proper stock handling
+    let maxStock;
+    if (item.stock !== undefined && item.stock !== null && item.stock !== '') {
+        maxStock = parseInt(item.stock);
+        maxStock = isNaN(maxStock) ? 10 : maxStock; // Default to 10 if parsing fails
+    } else {
+        maxStock = 10; // Default only when stock is missing
+    }
+    
+    console.log(`Cart item ${item.name}: stored stock=${item.stock}, parsed maxStock=${maxStock}`);
     
     return `
         <div class="cart-item" data-id="${item.id}">
@@ -367,7 +371,8 @@ function createCartItem(item) {
                     ${formatPrice(item.price)}
                     <div class="price-note">Per piece</div>
                 </div>
-                ${maxStock <= 5 ? `<div class="low-stock" style="color: #f59e0b; font-size: 0.8rem; margin-top: 4px;">Only ${maxStock} left in stock!</div>` : ''}
+                ${maxStock <= 5 && maxStock > 0 ? `<div class="low-stock" style="color: #f59e0b; font-size: 0.8rem; margin-top: 4px;">Only ${maxStock} left in stock!</div>` : ''}
+                ${maxStock <= 0 ? `<div class="low-stock" style="color: #dc2626; font-size: 0.8rem; margin-top: 4px;">Out of Stock</div>` : ''}
             </div>
             <div class="quantity-controls">
                 <button class="quantity-btn" onclick="decreaseQuantity('${item.id}')" ${item.quantity <= 1 ? 'disabled' : ''}>
@@ -375,7 +380,7 @@ function createCartItem(item) {
                 </button>
                 <input type="number" class="quantity-input" value="${item.quantity}" 
                        onchange="updateQuantity('${item.id}', this.value)" min="1" max="${maxStock}">
-                <button class="quantity-btn" onclick="increaseQuantity('${item.id}')" ${item.quantity >= maxStock ? 'disabled' : ''}>
+                <button class="quantity-btn" onclick="increaseQuantity('${item.id}')" ${item.quantity >= maxStock || maxStock <= 0 ? 'disabled' : ''}>
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -397,9 +402,9 @@ function getDeliveryCharge() {
         return 20;
     } else {
         if (currentDeliveryOption === 'outside-normal') {
-            return 60;
+            return 50;
         } else if (currentDeliveryOption === 'outside-fasttrack') {
-            return 200;
+            return 150;
         }
     }
     return 0;
@@ -609,9 +614,18 @@ function updateCouponSuggestions(eligibleCoupons, suggestionsId, sectionSelector
 
 function getEligibleCoupons(subtotal, deliveryArea) {
     const eligible = [];
+    const currentDate = new Date(); // Get current date
 
     Object.entries(AVAILABLE_COUPONS).forEach(([code, coupon]) => {
         if (coupon.hidden) return; // Skip hidden coupons
+
+        // CHECK IF COUPON IS EXPIRED - ADD THIS BLOCK
+        if (coupon.expiryDate) {
+            const expiryDate = new Date(coupon.expiryDate + 'T23:59:59'); // End of the expiry day
+            if (currentDate > expiryDate) {
+                return; // Skip expired coupons - don't show them
+            }
+        }
 
         if (appliedCouponData && appliedCouponData.code === code) return;
         if (coupon.deliveryArea && coupon.deliveryArea !== deliveryArea) return;
@@ -746,7 +760,7 @@ function restoreCartState() {
                 setupDeliveryOptionsOutside();
                 showPincodeMessage(`📦 Delivery outside Jodhpur - Choose delivery option`, 'info');
                 
-                // Restore selected delivery option
+                // Only restore selected delivery option if one was previously selected
                 setTimeout(() => {
                     if (currentDeliveryOption) {
                         const option = document.querySelector(`input[value="${currentDeliveryOption}"]`);
@@ -755,6 +769,9 @@ function restoreCartState() {
                             option.closest('.delivery-option').classList.add('selected');
                             enableCheckoutButton();
                         }
+                    } else {
+                        // No option was previously selected, keep checkout disabled
+                        disableCheckoutButton();
                     }
                 }, 100);
             }
@@ -888,7 +905,7 @@ function showCouponMessage(message, type) {
     }
 }
 
-// ===== QUANTITY MANAGEMENT =====
+// ===== QUANTITY MANAGEMENT - FIXED STOCK HANDLING =====
 function decreaseQuantity(productId) {
     const item = cart.find(item => item.id === productId);
     if (item && item.quantity > 1) {
@@ -899,12 +916,25 @@ function decreaseQuantity(productId) {
 
 function increaseQuantity(productId) {
     const item = cart.find(item => item.id === productId);
-    const maxStock = item.stock || 10;
+    if (!item) return;
     
-    if (item && item.quantity < maxStock) {
+    // FIXED: Proper stock handling
+    let maxStock;
+    if (item.stock !== undefined && item.stock !== null && item.stock !== '') {
+        maxStock = parseInt(item.stock);
+        maxStock = isNaN(maxStock) ? 10 : maxStock;
+    } else {
+        maxStock = 10;
+    }
+    
+    console.log(`Increase quantity for ${item.name}: current=${item.quantity}, maxStock=${maxStock}`);
+    
+    if (item.quantity < maxStock && maxStock > 0) {
         item.quantity += 1;
         updateCartData();
-    } else if (item) {
+    } else if (maxStock <= 0) {
+        showToast(`This item is out of stock`, 'error');
+    } else {
         showToast(`Only ${maxStock} items available in stock`, 'error');
     }
 }
@@ -919,7 +949,14 @@ function updateQuantity(productId, newQuantity) {
         return;
     }
     
-    const maxStock = item.stock || 10;
+    // FIXED: Proper stock handling
+    let maxStock;
+    if (item.stock !== undefined && item.stock !== null && item.stock !== '') {
+        maxStock = parseInt(item.stock);
+        maxStock = isNaN(maxStock) ? 10 : maxStock;
+    } else {
+        maxStock = 10;
+    }
     
     if (isNaN(quantity) || quantity < 1) {
         showToast('Invalid quantity', 'error');

@@ -1,4 +1,4 @@
-// ===== SHOP PAGE JAVASCRIPT - ENHANCED VERSION =====
+// ===== SHOP PAGE JAVASCRIPT - FIXED STOCK HANDLING =====
 let allProducts = [];
 let filteredProducts = [];
 let currentFilters = {
@@ -105,6 +105,7 @@ function parseCSV(csvText) {
     
     const nameIndex = headers.indexOf('name');
     const priceIndex = headers.indexOf('price');
+    const stockIndex = headers.indexOf('stock');
     
     if (nameIndex === -1 || priceIndex === -1) return [];
     
@@ -117,18 +118,27 @@ function parseCSV(csvText) {
         
         if (!name || !price || price <= 0) continue;
         
+        // FIXED: Proper stock handling - only use default when stock is missing/empty
+        let stock;
+        if (stockIndex !== -1 && values[stockIndex] !== undefined && values[stockIndex] !== '') {
+            stock = parseInt(values[stockIndex]);
+        } else {
+            stock = 0; // Default only when stock column is missing or empty
+        }
+        
         const product = {
             id: values[headers.indexOf('id')] || `rakhi-${Date.now()}-${i}`,
             name: name,
             price: price,
             image: values[headers.indexOf('image')] || getDefaultImage(values[headers.indexOf('category')]),
             category: values[headers.indexOf('category')] || 'Designer',
-            stock: parseInt(values[headers.indexOf('stock')]) || 10
+            stock: stock
         };
         
         products.push(product);
     }
     
+    console.log('Loaded products with stock:', products.map(p => ({ name: p.name, stock: p.stock })));
     return products;
 }
 
@@ -145,61 +155,6 @@ function getDefaultImage(category) {
     
     const cat = (category || 'designer').toLowerCase();
     return defaultImages[cat] || defaultImages['designer'];
-}
-
-function loadSampleData() {
-    allProducts = [
-        {
-            id: 'rakhi-001',
-            name: 'Golden Thread Designer Rakhi',
-            price: 299,
-            image: 'https://images.unsplash.com/photo-1628191081813-a97dd6f46ae8?w=400&h=400&fit=crop&crop=center',
-            category: 'Designer',
-            stock: 15
-        },
-        {
-            id: 'rakhi-002',
-            name: 'Pure Silver Ganesh Rakhi',
-            price: 599,
-            image: 'https://images.unsplash.com/photo-1606407762584-d681bf2167e3?w=400&h=400&fit=crop&crop=center',
-            category: 'Silver',
-            stock: 8
-        },
-        {
-            id: 'rakhi-003',
-            name: 'Cartoon Character Kids Rakhi',
-            price: 149,
-            image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=400&fit=crop&crop=center',
-            category: 'Kids',
-            stock: 25
-        },
-        {
-            id: 'rakhi-004',
-            name: 'Bhaiya Bhabhi Set - Red & Gold',
-            price: 449,
-            image: 'https://images.unsplash.com/photo-1583275863106-e45f45bcd2b9?w=400&h=400&fit=crop&crop=center',
-            category: 'Bhaiya-Bhabhi',
-            stock: 12
-        },
-        {
-            id: 'rakhi-005',
-            name: 'Kumkum Chawal Traditional Set',
-            price: 199,
-            image: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=400&fit=crop&crop=center',
-            category: 'Kumkum-Chawal',
-            stock: 20
-        },
-        {
-            id: 'rakhi-006',
-            name: 'Simple Thread Rakhi Pack',
-            price: 99,
-            image: 'https://images.unsplash.com/photo-1628191081813-a97dd6f46ae8?w=400&h=400&fit=crop&crop=center',
-            category: 'Thread',
-            stock: 30
-        }
-    ];
-    
-    filteredProducts = [...allProducts];
 }
 
 // ===== DESKTOP FILTERS =====
@@ -525,9 +480,12 @@ function displayProducts() {
 }
 
 function createProductCard(product) {
+    // FIXED: Proper out of stock detection
     const isOutOfStock = product.stock <= 0;
     const cartItem = cart.find(item => item.id === product.id);
     const inCartQuantity = cartItem ? cartItem.quantity : 0;
+    
+    console.log(`Product ${product.name}: stock=${product.stock}, isOutOfStock=${isOutOfStock}`);
     
     return `
         <div class="product-card" data-id="${product.id}">
@@ -548,8 +506,9 @@ function createProductCard(product) {
                     <div class="price-note">Per piece</div>
                 </div>
                 ${product.stock <= 5 && product.stock > 0 ? `<div class="low-stock">Only ${product.stock} left!</div>` : ''}
+                ${isOutOfStock ? `<div class="low-stock" style="color: #dc2626;">Out of Stock</div>` : ''}
                 
-                ${inCartQuantity > 0 ? `
+                ${inCartQuantity > 0 && !isOutOfStock ? `
                     <div class="product-quantity-controls show">
                         <button class="product-qty-btn" onclick="decreaseProductQuantity('${product.id}')">
                             <i class="fas fa-minus"></i>
@@ -564,7 +523,7 @@ function createProductCard(product) {
                     <button class="add-to-cart-btn" 
                             onclick="addToCartFromShop('${product.id}', '${product.name}', '${product.price}', '${product.image}', '${product.category}', '${product.stock}')"
                             ${isOutOfStock ? 'disabled' : ''}>
-                        <i class="fas fa-shopping-cart"></i>
+                        <i class="fas fa-${isOutOfStock ? 'times' : 'shopping-cart'}"></i>
                         ${isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                     </button>
                 `}
@@ -626,7 +585,16 @@ function handleMobileCardClick(event) {
 
 // ===== ENHANCED ADD TO CART FUNCTIONALITY =====
 function addToCartFromShop(productId, productName, productPrice, productImage, productCategory, productStock) {
-    addToCart(productId, productName, productPrice, productImage, productCategory, productStock);
+    // FIXED: Proper stock validation
+    const actualStock = parseInt(productStock);
+    
+    // Don't allow adding to cart if stock is 0
+    if (actualStock <= 0) {
+        showToast('This item is out of stock', 'error');
+        return;
+    }
+    
+    addToCart(productId, productName, productPrice, productImage, productCategory, actualStock);
     // Refresh the product card to show quantity controls
     setTimeout(() => {
         displayProducts();
@@ -639,7 +607,8 @@ function increaseProductQuantity(productId) {
     
     if (!product || !cartItem) return;
     
-    if (cartItem.quantity < product.stock) {
+    // Check actual stock from product data
+    if (cartItem.quantity < product.stock && product.stock > 0) {
         cartItem.quantity += 1;
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartCount();
@@ -686,6 +655,7 @@ function openQuickView(productId) {
     // Check if item is already in cart
     const cartItem = cart.find(item => item.id === productId);
     const inCartQuantity = cartItem ? cartItem.quantity : 0;
+    const isOutOfStock = product.stock <= 0;
     
     // Determine stock status
     let stockStatus = '';
@@ -710,20 +680,16 @@ function openQuickView(productId) {
             <div class="quick-view-category">${product.category}</div>
             <h2 class="quick-view-title">${product.name}</h2>
             <div class="quick-view-price">
-    ${formatPrice(product.price)}
-    <div class="price-note">Per piece</div>
-</div>
+                ${formatPrice(product.price)}
+                <div class="price-note">Per piece</div>
+            </div>
             <div class="quick-view-stock">
                 <span class="stock-status ${stockClass}">${stockStatus}</span>
                 ${inCartQuantity > 0 ? `<div class="cart-info"><i class="fas fa-shopping-cart"></i> ${inCartQuantity} in cart</div>` : ''}
             </div>
             
-            <div class="quick-view-description">
-                <p>Beautiful handcrafted rakhi perfect for celebrating the sacred bond of Raksha Bandhan. Made with premium materials and traditional designs.</p>
-            </div>
-            
             <div class="quick-view-actions">
-                ${product.stock > 0 ? `
+                ${!isOutOfStock ? `
                     <div class="quick-view-quantity">
                         <span class="quantity-label">Quantity:</span>
                         <div class="quantity-selector">
@@ -746,6 +712,9 @@ function openQuickView(productId) {
                         <i class="fas fa-times"></i>
                         Out of Stock
                     </button>
+                    <p style="text-align: center; color: #6b7280; margin-top: 15px; font-size: 0.9rem;">
+                        This item is currently unavailable
+                    </p>
                 `}
             </div>
         </div>
@@ -753,42 +722,6 @@ function openQuickView(productId) {
     
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
-    
-    // Add CSS for cart info
-    if (!document.getElementById('quickViewStyles')) {
-        const style = document.createElement('style');
-        style.id = 'quickViewStyles';
-        style.textContent = `
-            .cart-info {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                margin-left: 15px;
-                padding: 4px 12px;
-                background: #d1fae5;
-                color: #065f46;
-                border-radius: 12px;
-                font-size: 0.85rem;
-                font-weight: 500;
-            }
-            
-            .quick-view-description {
-                margin: 20px 0;
-                padding: 15px;
-                background: #f8f9fa;
-                border-radius: 8px;
-                border-left: 4px solid var(--primary-red);
-            }
-            
-            .quick-view-description p {
-                color: #6b7280;
-                font-size: 0.9rem;
-                line-height: 1.5;
-                margin: 0;
-            }
-        `;
-        document.head.appendChild(style);
-    }
 }
 
 function closeQuickView() {
@@ -847,8 +780,17 @@ function updateQuickViewUI() {
 }
 
 function addToCartFromQuickView(productId, productName, productPrice, productImage, productCategory, productStock) {
+    // FIXED: Validate stock before adding
+    const actualStock = parseInt(productStock);
+    
+    if (actualStock <= 0) {
+        showToast('This item is out of stock', 'error');
+        closeQuickView();
+        return;
+    }
+    
     for (let i = 0; i < quickViewQuantity; i++) {
-        addToCart(productId, productName, productPrice, productImage, productCategory, productStock);
+        addToCart(productId, productName, productPrice, productImage, productCategory, actualStock);
     }
     closeQuickView();
     showToast(`Added ${quickViewQuantity} item(s) to cart!`, 'success');
@@ -865,6 +807,7 @@ function startAutoRefresh() {
             const oldCount = allProducts.length;
             if (await loadFromCSV()) {
                 if (allProducts.length !== oldCount) {
+                    console.log('Products updated via auto-refresh');
                     applyFilters();
                 }
             }
@@ -931,4 +874,3 @@ if (typeof window !== 'undefined') {
     window.increaseProductQuantity = increaseProductQuantity;
     window.decreaseProductQuantity = decreaseProductQuantity;
 }
-
