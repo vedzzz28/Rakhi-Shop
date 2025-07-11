@@ -182,7 +182,19 @@ function autoPopulateFormData() {
     // Set payment method based on delivery area
     updatePaymentMethodBasedOnDelivery();
 }
-
+function getDeliveryTitle() {
+    if (!deliveryData) return '';
+    
+    if (deliveryData.area === 'jodhpur') {
+        if (deliveryData.option === 'jodhpur-takeaway') {
+            return 'Self Pickup';
+        } else {
+            return 'Home Delivery (Jodhpur)';
+        }
+    } else {
+        return 'Outside Jodhpur Delivery';
+    }
+}
 // ===== UPDATE DELIVERY AREA DISPLAY =====
 function updateDeliveryAreaDisplay() {
     if (!deliveryData) return;
@@ -196,10 +208,10 @@ function updateDeliveryAreaDisplay() {
         deliveryDisplay.innerHTML = `
             <div class="delivery-area-info ${isJodhpur ? 'jodhpur' : 'outside'}">
                 <div class="area-icon">
-                    <i class="fas fa-${isJodhpur ? 'home' : 'truck'}"></i>
+                    <i class="fas fa-${isJodhpur && deliveryData.option === 'jodhpur-takeaway' ? 'store' : isJodhpur ? 'home' : 'truck'}"></i>
                 </div>
                 <div class="area-details">
-                    <strong>${isJodhpur ? 'Within Jodhpur' : 'Outside Jodhpur'}</strong>
+                    <strong>${getDeliveryTitle()}</strong>
                     <span class="area-description">${deliveryText}</span>
                 </div>
                 <div class="area-charge">₹${deliveryData.charge}</div>
@@ -213,8 +225,12 @@ function getDeliveryOptionText() {
     if (!deliveryData) return '';
     
     if (deliveryData.area === 'jodhpur') {
-        return '1-2 business days';
-    } else {
+    if (deliveryData.option === 'jodhpur-takeaway') {
+        return 'Pick up from our store - A-31, Umed Club Road, Raika Bagh, Jodhpur';
+    } else if (deliveryData.option === 'jodhpur-delivery') {
+        return 'Home delivery: 1-2 business days';
+    }
+} else {
         if (deliveryData.option === 'outside-normal') {
             return 'Normal delivery: 5-7 business days';
         } else if (deliveryData.option === 'outside-fasttrack') {

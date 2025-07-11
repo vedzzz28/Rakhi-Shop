@@ -171,7 +171,7 @@ function detectDeliveryFromPincode() {
     currentDeliveryArea = isJodhpur ? 'jodhpur' : 'outside';
     
     if (isJodhpur) {
-        showPincodeMessage(`✅ Delivery within Jodhpur - ₹20`, 'success');
+        showPincodeMessage(`✅ Order within Jodhpur - Choose delivery option`, 'info');
         setupDeliveryOptionsJodhpur();
     } else {
         showPincodeMessage(`📦 Delivery outside Jodhpur - Choose delivery option`, 'info');
@@ -200,21 +200,49 @@ function setupDeliveryOptionsJodhpur() {
         deliverySection.innerHTML = `
             <h4>Delivery Options</h4>
             <div class="delivery-options">
-                <label class="delivery-option selected">
-                    <input type="radio" name="delivery" value="jodhpur" checked>
+                <label class="delivery-option">
+                    <input type="radio" name="delivery" value="jodhpur-takeaway">
                     <span class="radio-mark"></span>
                     <div class="delivery-info">
-                        <strong>Within Jodhpur</strong>
+                        <strong>Take Away</strong>
+                        <span class="delivery-time">Collect from our store</span>
+                        <span class="delivery-price">₹0</span>
+                    </div>
+                </label>
+                <label class="delivery-option">
+                    <input type="radio" name="delivery" value="jodhpur-delivery">
+                    <span class="radio-mark"></span>
+                    <div class="delivery-info">
+                        <strong>Home Delivery</strong>
                         <span class="delivery-time">1-2 business days</span>
                         <span class="delivery-price">₹20</span>
                     </div>
                 </label>
             </div>
         `;
-        currentDeliveryOption = 'jodhpur';
+        
+        // Setup event listeners for outside delivery options
+        const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
+        deliveryOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                currentDeliveryOption = this.value;
+                localStorage.setItem('currentDeliveryOption', currentDeliveryOption);
+                updateCartSummary();
+                enableCheckoutButton();
+                
+                // Update visual selection
+                document.querySelectorAll('.delivery-option').forEach(opt => opt.classList.remove('selected'));
+                this.closest('.delivery-option').classList.add('selected');
+            });
+        });
+        
+        // REMOVED: No automatic selection - user must choose
+        // Reset currentDeliveryOption to null so user must select
+        currentDeliveryOption = null;
     }
     
-    enableCheckoutButton();
+    // Keep checkout button disabled until option is selected
+    disableCheckoutButton();
 }
 
 function setupDeliveryOptionsOutside() {
@@ -396,18 +424,21 @@ function createCartItem(item) {
 
 // ===== CALCULATE DELIVERY CHARGE =====
 function getDeliveryCharge() {
-    if (!currentDeliveryArea || !currentDeliveryOption) return 0;
+    if (!currentDeliveryArea || !currentDeliveryOption) return -1;
     
     if (currentDeliveryArea === 'jodhpur') {
-        return 20;
-    } else {
+    if (currentDeliveryOption === 'jodhpur-takeaway') {
+        return 0; // FREE takeaway
+    } else if (currentDeliveryOption === 'jodhpur-delivery') {
+        return 20; // Home delivery
+    }}else {
         if (currentDeliveryOption === 'outside-normal') {
             return 50;
         } else if (currentDeliveryOption === 'outside-fasttrack') {
             return 150;
         }
     }
-    return 0;
+    return -1;
 }
 
 // ===== CALCULATE CURRENT DISCOUNT =====
@@ -475,13 +506,15 @@ function updateCartSummary() {
     if (itemCount) itemCount.textContent = itemsCount;
     if (subtotalElement) subtotalElement.textContent = formatPrice(subtotal);
     if (deliveryCharges) {
-        if (delivery > 0) {
+        if (delivery >= 0) {
             let deliveryText = formatPrice(delivery);
             if (currentDeliveryOption === 'outside-normal') {
                 deliveryText += ' (Normal)';
             } else if (currentDeliveryOption === 'outside-fasttrack') {
                 deliveryText += ' (Fast Track)';
-            }
+            } else if (currentDeliveryOption === 'jodhpur-takeaway') {
+    deliveryText += ' (Takeaway)';
+}
             deliveryCharges.textContent = deliveryText;
         } else {
             deliveryCharges.textContent = 'Enter pincode';
