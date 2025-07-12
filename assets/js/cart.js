@@ -46,7 +46,7 @@ const AVAILABLE_COUPONS = {
     'JODHPUR15': { 
         discount: 15, 
         type: 'percentage', 
-        minOrder: 300, 
+        minOrder: 400, 
         deliveryArea: 'jodhpur',
         description: 'FLAT 15% off for delivery within Jodhpur',
         maxDiscount: 5000,
@@ -92,7 +92,7 @@ const AVAILABLE_COUPONS = {
         discount: 80,
         type: 'delivery',
         minOrder: 700,
-        description: 'Discount on Deliver (upto ₹35) on orders above ₹700',
+        description: 'Discount on Delivery (upto ₹35) on orders above ₹700',
         maxDiscount: 35
     },
     'RATHI20': {
@@ -271,13 +271,13 @@ function setupDeliveryOptionsJodhpur() {
         const homeDeliveryOption = document.getElementById('jodhpur-delivery-option');
         const homeDeliveryInput = document.querySelector('input[value="jodhpur-delivery"]');
         
-        if (currentTotal < 150) {
+        if (currentTotal < 200) {
             homeDeliveryOption.style.opacity = '0.5';
             homeDeliveryInput.disabled = true;
             
             // Add minimum order note
             const deliveryTime = homeDeliveryOption.querySelector('.delivery-time');
-            deliveryTime.innerHTML = `Minimum order ₹150 required<br><small>Current: ${formatPrice(currentTotal)}</small>`;
+            deliveryTime.innerHTML = `Minimum order ₹200 required<br><small>Current: ${formatPrice(currentTotal)}</small>`;
             deliveryTime.style.color = '#dc2626';
         }
         
@@ -286,8 +286,8 @@ function setupDeliveryOptionsJodhpur() {
         deliveryOptions.forEach(option => {
             option.addEventListener('change', function() {
                 // Check minimum order again
-                if (this.value === 'jodhpur-delivery' && getCartTotal() < 150) {
-                    showToast('Minimum order ₹150 required for home delivery in Jodhpur', 'error');
+                if (this.value === 'jodhpur-delivery' && getCartTotal() < 200) {
+                    showToast('Minimum order ₹200 required for home delivery in Jodhpur', 'error');
                     this.checked = false;
                     return;
                 }
@@ -503,7 +503,7 @@ function getDeliveryCharge() {
             return 150;
         }
     }
-    return -1;
+    return 0;
 }
 
 // ===== CALCULATE CURRENT DISCOUNT =====
@@ -651,7 +651,7 @@ function updateCartSummary() {
             if (appliedCouponData.type === 'percentage' || appliedCouponData.type === 'delivery') {
                 shouldShowDiscount = currentDiscount > 0;
                 if (appliedCouponData.type === 'delivery') {
-                    discountText = `FREE DELIVERY: -${formatPrice(currentDiscount)}`;
+                    discountText = `ON DELIVERY: -${formatPrice(currentDiscount)}`;
                 } else {
                     discountText = `-${formatPrice(currentDiscount)}`;
                 }
@@ -697,7 +697,6 @@ function updateCartSummary() {
 }
 
 // ===== DISPLAY ELIGIBLE COUPONS (MOBILE ONLY) =====
-// ===== DISPLAY ELIGIBLE COUPONS (SIMPLIFIED) =====
 function displayEligibleCoupons() {
     const subtotal = getCartTotal();
     const eligibleCoupons = getEligibleCoupons(subtotal, currentDeliveryArea);
