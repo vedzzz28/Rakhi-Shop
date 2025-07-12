@@ -32,7 +32,7 @@ function isCouponAvailableByDate(couponCode) {
     const availabilityDate = new Date('2025-07-21T00:00:00'); // 21-7-2025
     
     // Always available coupons
-    const alwaysAvailable = ['EARLYBIRD','JODHPUR15','SHIPFREE35', 'RATHI20', 'VEDZZSP10'];
+    const alwaysAvailable = ['JODHPUR15','EARLYBIRD','FREEGIFT', 'RATHI20', 'VEDZZSP10'];
     
     if (alwaysAvailable.includes(couponCode)) {
         return true;
@@ -41,14 +41,14 @@ function isCouponAvailableByDate(couponCode) {
     // Other coupons available from 21-7-2025
     return currentDate >= availabilityDate;
 }
-// ===== UPDATED COUPON SYSTEM - 6 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
+// ===== UPDATED COUPON SYSTEM - 7 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
 const AVAILABLE_COUPONS = {
     'JODHPUR15': { 
         discount: 15, 
         type: 'percentage', 
         minOrder: 400, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 15% off for delivery within Jodhpur',
+        description: 'FLAT 15% off for orders within Jodhpur',
         maxDiscount: 5000,
         expiryDate: '2025-07-20'
     },
@@ -74,19 +74,19 @@ const AVAILABLE_COUPONS = {
         minOrder: 2000,
         description: 'Flat ₹200 off on orders above ₹2000'
     },
-    'BULKCART10': { 
+    'BULKCART': { 
         discount: 10, 
         type: 'percentage', 
         minOrder: 3100, 
         description: '10% off (upto ₹450) on orders above ₹3100',
         maxDiscount: 450
     },
-    'PUJATHALI': { 
+    'FREEGIFT': { 
         discount: 0, 
         type: 'gift', 
         minOrder: 1000,
-        description: 'Free mini puja thali worth ₹70 on orders above ₹1000',
-        gift: 'Mini Puja Thali'
+        description: 'Free GIFT worth atleast ₹65 on orders above ₹1000',
+        gift: 'a Sacred Accessory',
     },
     'SHIPFREE35': {
         discount: 80,
@@ -1028,6 +1028,15 @@ function applyCouponLogic(code, messageCallback) {
     if (!isCouponAvailableByDate(code)) {
         messageCallback('This coupon is not yet available. Available from 21st July 2025.', 'error');
         return;
+    }
+
+    if (coupon.expiryDate) {
+        const currentDate = new Date();
+        const expiryDate = new Date(coupon.expiryDate + 'T23:59:59');
+        if (currentDate > expiryDate) {
+            messageCallback('This coupon has expired and is no longer valid.', 'error');
+            return;
+        }
     }
     
     // Check delivery area requirement
