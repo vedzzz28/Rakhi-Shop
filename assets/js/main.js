@@ -412,8 +412,15 @@ function removeFromLocalStorage(key) {
 }
 
 // ===== PRODUCT CARD GENERATION =====
+// Add this helper function in main.js
+function isSilverRakhi(product) {
+    return product.category && product.category.toLowerCase().includes('silver');
+}
+
+// Update createProductCard function to show silver note
 function createProductCard(product) {
     const isOutOfStock = product.stock <= 0;
+    const isSilver = isSilverRakhi(product);
     
     return `
         <div class="product-card" data-category="${product.category.toLowerCase().replace(/\s+/g, '-')}">
@@ -429,6 +436,7 @@ function createProductCard(product) {
                 <div class="product-category">${product.category}</div>
                 <h3 class="product-title">${product.name}</h3>
                 <div class="product-price">${formatPrice(product.price)}</div>
+                ${isSilver ? '<div class="silver-note" style="font-size: 0.75rem; color: #6b7280; margin-top: 4px;">*Limited coupon discounts applicable</div>' : ''}
                 ${product.stock <= 5 && product.stock > 0 ? `<div class="low-stock">Only ${product.stock} left!</div>` : ''}
                 <button class="add-to-cart-btn" onclick="addToCart('${product.id}', '${product.name}', '${product.price}', '${product.image}', '${product.category}', '${product.stock}')" ${isOutOfStock ? 'disabled' : ''}>
                     <i class="fas fa-shopping-cart"></i>

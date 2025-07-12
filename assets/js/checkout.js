@@ -3,7 +3,20 @@ let checkoutCart = [];
 let deliveryData = null; // Will be loaded from cart
 let appliedCouponData = null; // Store full coupon data for dynamic calculation
 let isSubmitting = false;
+// ===== SILVER RAKHI HELPER FUNCTIONS =====
+function isSilverRakhi(item) {
+    return item.category && item.category.toLowerCase().includes('silver');
+}
 
+function calculateSilverRakhiTotal() {
+    return checkoutCart.filter(isSilverRakhi)
+        .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+function calculateNonSilverRakhiTotal() {
+    return checkoutCart.filter(item => !isSilverRakhi(item))
+        .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
 // ===== JODHPUR PINCODES LIST =====
 const JODHPUR_PINCODES = [
     // Main Jodhpur City
@@ -63,6 +76,15 @@ function validateCheckoutData() {
     if (!deliveryData || !deliveryData.pincode) {
         redirectToCart('Please select delivery options in cart first');
         return false;
+    }
+    
+    // Check minimum order for Jodhpur home delivery
+    if (deliveryData.area === 'jodhpur' && deliveryData.option === 'jodhpur-delivery') {
+        const subtotal = checkoutCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        if (subtotal < 150) {
+            redirectToCart('Minimum order ₹150 required for home delivery in Jodhpur');
+            return false;
+        }
     }
     
     return true;
@@ -315,15 +337,39 @@ function updateOrderSummary() {
     if (appliedCouponData && subtotal >= appliedCouponData.minOrder) {
         // Check delivery area requirement for coupon
         if (!appliedCouponData.deliveryArea || appliedCouponData.deliveryArea === deliveryData?.area) {
+            const silverTotal = calculateSilverRakhiTotal();
+            const nonSilverTotal = calculateNonSilverRakhiTotal();
+            
             if (appliedCouponData.type === 'percentage') {
-                currentDiscount = Math.round((subtotal * appliedCouponData.discount) / 100);
+                if (appliedCouponData.hidden) {
+                    // Hidden coupons: 5% on silver, full discount on non-silver
+                    const silverDiscount = Math.round((silverTotal * 5) / 100);
+                    const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+                    currentDiscount = silverDiscount + nonSilverDiscount;
+                } else {
+                    // Regular coupons: discount only on non-silver items
+                    currentDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+                }
+                
                 if (appliedCouponData.maxDiscount) {
                     currentDiscount = Math.min(currentDiscount, appliedCouponData.maxDiscount);
                 }
             } else if (appliedCouponData.type === 'fixed') {
-                currentDiscount = appliedCouponData.discount;
+                if (appliedCouponData.hidden) {
+                    // Hidden coupons: full fixed discount regardless of silver items
+                    currentDiscount = appliedCouponData.discount;
+                } else {
+                    // Regular coupons: fixed discount only if there are non-silver items
+                    if (nonSilverTotal > 0) {
+                        currentDiscount = appliedCouponData.discount;
+                    } else {
+                        currentDiscount = 0;
+                    }
+                }
+            } else if (appliedCouponData.type === 'gift') {
+                // Gift doesn't affect price calculation
+                currentDiscount = 0;
             } else if (appliedCouponData.type === 'delivery') {
-                // For delivery discount, return the minimum of delivery charge or max discount
                 currentDiscount = Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
             }
         }
@@ -351,16 +397,44 @@ function updateOrderSummary() {
     }
 
     if (discountRow) {
-        if (currentDiscount > 0 && appliedCouponData) {
-            discountRow.style.display = 'flex';
-            if (orderDiscount) {
-                let discountText = `- ${formatPrice(currentDiscount)}`;
-                if (appliedCouponData.type === 'gift') {
-                    discountText = `FREE: ${appliedCouponData.gift}`;
-                } else if (appliedCouponData.type === 'delivery') {
+        if (appliedCouponData) {
+            const silverTotal = calculateSilverRakhiTotal();
+            const nonSilverTotal = calculateNonSilverRakhiTotal();
+            
+            // Check if coupon is effective
+            let shouldShowDiscount = false;
+            let discountText = '';
+            
+            if (appliedCouponData.type === 'percentage' || appliedCouponData.type === 'delivery') {
+                shouldShowDiscount = currentDiscount > 0;
+                if (appliedCouponData.type === 'delivery') {
                     discountText = `FREE DELIVERY: -${formatPrice(currentDiscount)}`;
+                } else {
+                    discountText = `-${formatPrice(currentDiscount)}`;
                 }
-                orderDiscount.textContent = discountText;
+            } else if (appliedCouponData.type === 'fixed') {
+                if (appliedCouponData.hidden) {
+                    shouldShowDiscount = true;
+                    discountText = `-${formatPrice(currentDiscount)}`;
+                } else {
+                    shouldShowDiscount = nonSilverTotal > 0;
+                    if (shouldShowDiscount) {
+                        discountText = `-${formatPrice(currentDiscount)}`;
+                    }
+                }
+            } else if (appliedCouponData.type === 'gift') {
+                // Gift coupons: Always show - applicable to all items
+                shouldShowDiscount = true;
+                discountText = `FREE: ${appliedCouponData.gift}`;
+            }
+            
+            if (shouldShowDiscount) {
+                discountRow.style.display = 'flex';
+                if (orderDiscount) {
+                    orderDiscount.textContent = discountText;
+                }
+            } else {
+                discountRow.style.display = 'none';
             }
         } else {
             discountRow.style.display = 'none';
@@ -369,7 +443,6 @@ function updateOrderSummary() {
 
     if (orderTotal) orderTotal.textContent = formatPrice(total);
 }
-
 // ===== SETUP PAYMENT METHOD HANDLING =====
 function setupPaymentMethodHandling() {
     const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');

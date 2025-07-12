@@ -11,8 +11,37 @@ const JODHPUR_PINCODES = [
     '342001', '342002', '342003', '342004', '342005', '342006', '342007', '342008', 
     '342009', '342010', '342011', '342012', '342013', '342014', '342015', '342016',
 ];
+// ===== SILVER RAKHI HELPER FUNCTIONS =====
+function isSilverRakhi(item) {
+    return item.category && item.category.toLowerCase().includes('silver');
+}
 
-// ===== UPDATED COUPON SYSTEM - 4 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
+function calculateSilverRakhiTotal() {
+    return cart.filter(isSilverRakhi)
+        .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+function calculateNonSilverRakhiTotal() {
+    return cart.filter(item => !isSilverRakhi(item))
+        .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+// ===== DATE CHECKING FOR COUPONS =====
+function isCouponAvailableByDate(couponCode) {
+    const currentDate = new Date();
+    const availabilityDate = new Date('2025-07-21T00:00:00'); // 21-7-2025
+    
+    // Always available coupons
+    const alwaysAvailable = ['EARLYBIRD','JODHPUR15','SHIPFREE35', 'RATHI20', 'VEDZZSP10'];
+    
+    if (alwaysAvailable.includes(couponCode)) {
+        return true;
+    }
+    
+    // Other coupons available from 21-7-2025
+    return currentDate >= availabilityDate;
+}
+// ===== UPDATED COUPON SYSTEM - 6 SPECIFIC COUPONS + 2 PRIVATE COUPONS =====
 const AVAILABLE_COUPONS = {
     'JODHPUR15': { 
         discount: 15, 
@@ -20,6 +49,15 @@ const AVAILABLE_COUPONS = {
         minOrder: 300, 
         deliveryArea: 'jodhpur',
         description: 'FLAT 15% off for delivery within Jodhpur',
+        maxDiscount: 5000,
+        expiryDate: '2025-07-20'
+    },
+    'EARLYBIRD': { 
+        discount: 10, 
+        type: 'percentage', 
+        minOrder: 500, 
+        deliveryArea: 'outside',
+        description: 'FLAT 10% off for delivery outside Jodhpur',
         maxDiscount: 5000,
         expiryDate: '2025-07-20'
     },
@@ -35,6 +73,13 @@ const AVAILABLE_COUPONS = {
         type: 'fixed', 
         minOrder: 2000,
         description: 'Flat ₹200 off on orders above ₹2000'
+    },
+    'BULKCART10': { 
+        discount: 10, 
+        type: 'percentage', 
+        minOrder: 3100, 
+        description: '10% off (upto ₹450) on orders above ₹3100',
+        maxDiscount: 450
     },
     'PUJATHALI': { 
         discount: 0, 
@@ -209,7 +254,7 @@ function setupDeliveryOptionsJodhpur() {
                         <span class="delivery-price">₹0</span>
                     </div>
                 </label>
-                <label class="delivery-option">
+                <label class="delivery-option" id="jodhpur-delivery-option">
                     <input type="radio" name="delivery" value="jodhpur-delivery">
                     <span class="radio-mark"></span>
                     <div class="delivery-info">
@@ -221,10 +266,32 @@ function setupDeliveryOptionsJodhpur() {
             </div>
         `;
         
-        // Setup event listeners for outside delivery options
+        // Check minimum order for home delivery
+        const currentTotal = getCartTotal();
+        const homeDeliveryOption = document.getElementById('jodhpur-delivery-option');
+        const homeDeliveryInput = document.querySelector('input[value="jodhpur-delivery"]');
+        
+        if (currentTotal < 150) {
+            homeDeliveryOption.style.opacity = '0.5';
+            homeDeliveryInput.disabled = true;
+            
+            // Add minimum order note
+            const deliveryTime = homeDeliveryOption.querySelector('.delivery-time');
+            deliveryTime.innerHTML = `Minimum order ₹150 required<br><small>Current: ${formatPrice(currentTotal)}</small>`;
+            deliveryTime.style.color = '#dc2626';
+        }
+        
+        // Setup event listeners for delivery options
         const deliveryOptions = document.querySelectorAll('input[name="delivery"]');
         deliveryOptions.forEach(option => {
             option.addEventListener('change', function() {
+                // Check minimum order again
+                if (this.value === 'jodhpur-delivery' && getCartTotal() < 150) {
+                    showToast('Minimum order ₹150 required for home delivery in Jodhpur', 'error');
+                    this.checked = false;
+                    return;
+                }
+                
                 currentDeliveryOption = this.value;
                 localStorage.setItem('currentDeliveryOption', currentDeliveryOption);
                 updateCartSummary();
@@ -236,12 +303,10 @@ function setupDeliveryOptionsJodhpur() {
             });
         });
         
-        // REMOVED: No automatic selection - user must choose
-        // Reset currentDeliveryOption to null so user must select
+        // Reset currentDeliveryOption
         currentDeliveryOption = null;
     }
     
-    // Keep checkout button disabled until option is selected
     disableCheckoutButton();
 }
 
@@ -424,7 +489,7 @@ function createCartItem(item) {
 
 // ===== CALCULATE DELIVERY CHARGE =====
 function getDeliveryCharge() {
-    if (!currentDeliveryArea || !currentDeliveryOption) return -1;
+    if (!currentDeliveryArea || !currentDeliveryOption) return 0;
     
     if (currentDeliveryArea === 'jodhpur') {
     if (currentDeliveryOption === 'jodhpur-takeaway') {
@@ -447,6 +512,8 @@ function calculateCurrentDiscount() {
     
     const subtotal = getCartTotal();
     const deliveryCharge = getDeliveryCharge();
+    const silverTotal = calculateSilverRakhiTotal();
+    const nonSilverTotal = calculateNonSilverRakhiTotal();
     
     if (subtotal < appliedCouponData.minOrder) return 0;
     
@@ -455,17 +522,45 @@ function calculateCurrentDiscount() {
         return 0;
     }
     
+    let discount = 0;
+    
     if (appliedCouponData.type === 'percentage') {
-        const discount = Math.round((subtotal * appliedCouponData.discount) / 100);
-        return appliedCouponData.maxDiscount ? Math.min(discount, appliedCouponData.maxDiscount) : discount;
+        if (appliedCouponData.hidden) {
+            // Hidden coupons: 5% on silver, full discount on non-silver
+            const silverDiscount = Math.round((silverTotal * 5) / 100);
+            const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+            discount = silverDiscount + nonSilverDiscount;
+        } else {
+            // Regular coupons: discount only on non-silver items
+            discount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+        }
+        
+        // Apply max discount limit if exists
+        if (appliedCouponData.maxDiscount) {
+            discount = Math.min(discount, appliedCouponData.maxDiscount);
+        }
     } else if (appliedCouponData.type === 'fixed') {
-        return appliedCouponData.discount;
+        if (appliedCouponData.hidden) {
+            // Hidden coupons: full fixed discount regardless of silver items
+            discount = appliedCouponData.discount;
+        } else {
+            // Regular coupons: fixed discount only if there are non-silver items
+            if (nonSilverTotal > 0) {
+                discount = appliedCouponData.discount;
+            } else {
+                // All items are silver, no discount
+                discount = 0;
+            }
+        }
+    } else if (appliedCouponData.type === 'gift') {
+        // Gift coupons: Always applicable regardless of silver items
+        discount = 0; // Gift doesn't reduce total, it's a free item
     } else if (appliedCouponData.type === 'delivery') {
-        // For delivery discount, return the minimum of delivery charge or max discount
-        return Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
+        // Delivery discounts not affected by silver restriction
+        discount = Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
     }
     
-    return 0; // For gift type coupons
+    return discount;
 }
 
 // ===== UPDATE CART SUMMARY =====
@@ -513,8 +608,8 @@ function updateCartSummary() {
             } else if (currentDeliveryOption === 'outside-fasttrack') {
                 deliveryText += ' (Fast Track)';
             } else if (currentDeliveryOption === 'jodhpur-takeaway') {
-    deliveryText += ' (Takeaway)';
-}
+                deliveryText += ' (Takeaway)';
+            }
             deliveryCharges.textContent = deliveryText;
         } else {
             deliveryCharges.textContent = 'Enter pincode';
@@ -543,28 +638,57 @@ function updateCartSummary() {
         orderTotal.textContent = formatPrice(total);
     }
     
-    // Show/hide discount row only if there's a discount
+    // Show/hide discount row - Updated to handle all coupon types with silver restrictions
     if (discountRow) {
-        if (currentDiscount > 0 && appliedCouponData) {
-            discountRow.style.display = 'flex';
-            if (discountAmount) {
-                let discountText = '-' + formatPrice(currentDiscount);
-                if (appliedCouponData.type === 'gift') {
-                    discountText = `FREE: ${appliedCouponData.gift}`;
-                } else if (appliedCouponData.type === 'delivery') {
+        if (appliedCouponData) {
+            const silverTotal = calculateSilverRakhiTotal();
+            const nonSilverTotal = calculateNonSilverRakhiTotal();
+            
+            // Check if coupon is effective
+            let shouldShowDiscount = false;
+            let discountText = '';
+            
+            if (appliedCouponData.type === 'percentage' || appliedCouponData.type === 'delivery') {
+                shouldShowDiscount = currentDiscount > 0;
+                if (appliedCouponData.type === 'delivery') {
                     discountText = `FREE DELIVERY: -${formatPrice(currentDiscount)}`;
+                } else {
+                    discountText = `-${formatPrice(currentDiscount)}`;
                 }
-                discountAmount.textContent = discountText;
+            } else if (appliedCouponData.type === 'fixed') {
+                if (appliedCouponData.hidden) {
+                    shouldShowDiscount = true;
+                    discountText = `-${formatPrice(currentDiscount)}`;
+                } else {
+                    // Regular fixed coupons: only show if there are non-silver items
+                    shouldShowDiscount = nonSilverTotal > 0;
+                    if (shouldShowDiscount) {
+                        discountText = `-${formatPrice(currentDiscount)}`;
+                    }
+                }
+            } else if (appliedCouponData.type === 'gift') {
+                // Gift coupons: Always show - applicable to all items
+                shouldShowDiscount = true;
+                discountText = `FREE: ${appliedCouponData.gift}`;
             }
             
-            // Update coupon display with current discount
-            const couponInput = document.getElementById('couponCode');
-            const couponInputMobile = document.getElementById('couponCodeMobile');
-            if (couponInput && appliedCouponData) {
-                couponInput.value = appliedCouponData.code;
-            }
-            if (couponInputMobile && appliedCouponData) {
-                couponInputMobile.value = appliedCouponData.code;
+            if (shouldShowDiscount) {
+                discountRow.style.display = 'flex';
+                if (discountAmount) {
+                    discountAmount.textContent = discountText;
+                }
+                
+                // Update coupon display with current discount
+                const couponInput = document.getElementById('couponCode');
+                const couponInputMobile = document.getElementById('couponCodeMobile');
+                if (couponInput && appliedCouponData) {
+                    couponInput.value = appliedCouponData.code;
+                }
+                if (couponInputMobile && appliedCouponData) {
+                    couponInputMobile.value = appliedCouponData.code;
+                }
+            } else {
+                discountRow.style.display = 'none';
             }
         } else {
             discountRow.style.display = 'none';
@@ -573,9 +697,15 @@ function updateCartSummary() {
 }
 
 // ===== DISPLAY ELIGIBLE COUPONS (MOBILE ONLY) =====
+// ===== DISPLAY ELIGIBLE COUPONS (SIMPLIFIED) =====
 function displayEligibleCoupons() {
     const subtotal = getCartTotal();
     const eligibleCoupons = getEligibleCoupons(subtotal, currentDeliveryArea);
+    
+    // Show silver restriction message if function exists
+    if (typeof showSilverRestrictionMessage === 'function') {
+        showSilverRestrictionMessage();
+    }
     
     // Only show coupon suggestions on mobile (screen width <= 768px)
     const isMobile = window.innerWidth <= 768;
@@ -584,33 +714,34 @@ function displayEligibleCoupons() {
         // Mobile coupon suggestions
         updateCouponSuggestions(eligibleCoupons, 'couponSuggestionsMobile', '.coupon-section-mobile');
     } else {
-         let couponSuggestions = document.getElementById('couponSuggestions');
-    if (!couponSuggestions && eligibleCoupons.length > 0) {
-        couponSuggestions = document.createElement('div');
-        couponSuggestions.id = 'couponSuggestions';
-        couponSuggestions.className = 'coupon-suggestions';
-        couponSuggestions.innerHTML = `
-            <h4>🎉 Special Offers Available!</h4>
-            <div class="coupon-list" id="couponList"></div>
-        `;
+        // Desktop coupon suggestions
+        let couponSuggestions = document.getElementById('couponSuggestions');
+        if (!couponSuggestions && eligibleCoupons.length > 0) {
+            couponSuggestions = document.createElement('div');
+            couponSuggestions.id = 'couponSuggestions';
+            couponSuggestions.className = 'coupon-suggestions';
+            couponSuggestions.innerHTML = `
+                <h4>🎉 Special Offers Available!</h4>
+                <div class="coupon-list" id="couponList"></div>
+            `;
+            
+            // Insert after coupon input section
+            const couponSection = document.getElementById('couponSection') || document.querySelector('.coupon-section-mobile');
+            if (couponSection && couponSection.parentNode) {
+                couponSection.parentNode.insertBefore(couponSuggestions, couponSection.nextSibling);
+            }
+        }
         
-        // Insert after coupon input section
-        const couponSection = document.getElementById('couponSection') || document.querySelector('.coupon-section-mobile');
-        if (couponSection) {
-            couponSection.parentNode.insertBefore(couponSuggestions, couponSection.nextSibling);
+        // Update coupon list
+        const couponList = document.getElementById('couponList');
+        if (couponList) {
+            if (eligibleCoupons.length === 0) {
+                if (couponSuggestions) couponSuggestions.style.display = 'none';
+            } else {
+                if (couponSuggestions) couponSuggestions.style.display = 'block';
+                couponList.innerHTML = eligibleCoupons.map(coupon => createCouponCard(coupon, false)).join('');
+            }
         }
-    }
-    
-    // Update coupon list
-    const couponList = document.getElementById('couponList');
-    if (couponList) {
-        if (eligibleCoupons.length === 0) {
-            if (couponSuggestions) couponSuggestions.style.display = 'none';
-        } else {
-            if (couponSuggestions) couponSuggestions.style.display = 'block';
-            couponList.innerHTML = eligibleCoupons.map(createCouponCard).join('');
-        }
-    }
     }
 }
 
@@ -647,16 +778,21 @@ function updateCouponSuggestions(eligibleCoupons, suggestionsId, sectionSelector
 
 function getEligibleCoupons(subtotal, deliveryArea) {
     const eligible = [];
-    const currentDate = new Date(); // Get current date
+    const currentDate = new Date();
 
     Object.entries(AVAILABLE_COUPONS).forEach(([code, coupon]) => {
         if (coupon.hidden) return; // Skip hidden coupons
 
-        // CHECK IF COUPON IS EXPIRED - ADD THIS BLOCK
+        // CHECK DATE AVAILABILITY
+        if (!isCouponAvailableByDate(code)) {
+            return; // Skip if not available yet
+        }
+
+        // CHECK IF COUPON IS EXPIRED
         if (coupon.expiryDate) {
-            const expiryDate = new Date(coupon.expiryDate + 'T23:59:59'); // End of the expiry day
+            const expiryDate = new Date(coupon.expiryDate + 'T23:59:59');
             if (currentDate > expiryDate) {
-                return; // Skip expired coupons - don't show them
+                return; // Skip expired coupons
             }
         }
 
@@ -674,21 +810,71 @@ function createCouponCard(coupon, isMobile = false) {
     let savings = '';
     let icon = '💰';
     
+    // Get cart totals for proper calculation
+    const subtotal = getCartTotal();
+    const silverTotal = calculateSilverRakhiTotal();
+    const nonSilverTotal = calculateNonSilverRakhiTotal();
+    const deliveryCharge = getDeliveryCharge();
+    const hasOnlySilverItems = silverTotal > 0 && nonSilverTotal === 0;
+    
     if (coupon.type === 'percentage') {
-        const subtotal = getCartTotal();
-        const discount = Math.round((subtotal * coupon.discount) / 100);
-        const finalDiscount = coupon.maxDiscount ? Math.min(discount, coupon.maxDiscount) : discount;
-        savings = `Save ${formatPrice(finalDiscount)}`;
+        let actualDiscount = 0;
+        
+        if (coupon.hidden) {
+            // Hidden coupons: 5% on silver + full % on non-silver
+            const silverDiscount = Math.round((silverTotal * 5) / 100);
+            const nonSilverDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
+            actualDiscount = silverDiscount + nonSilverDiscount;
+            
+            if (coupon.maxDiscount) {
+                actualDiscount = Math.min(actualDiscount, coupon.maxDiscount);
+            }
+            
+            savings = `Save ${formatPrice(actualDiscount)}`;
+            if (silverTotal > 0) {
+                savings += ` (Special: 5% on silver, ${coupon.discount}% on others)`;
+            }
+        } else {
+            // Regular coupons: discount only on non-silver items
+            if (hasOnlySilverItems) {
+                savings = `Not applicable (Silver items only)`;
+            } else {
+                actualDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
+                if (coupon.maxDiscount) {
+                    actualDiscount = Math.min(actualDiscount, coupon.maxDiscount);
+                }
+                savings = `Save ${formatPrice(actualDiscount)}`;
+                if (silverTotal > 0) {
+                    savings += ` (on non-silver items only)`;
+                }
+            }
+        }
         icon = '🏷️';
+        
     } else if (coupon.type === 'fixed') {
-        savings = `Save ${formatPrice(coupon.discount)}`;
+        if (coupon.hidden) {
+            // Hidden coupons: full fixed discount regardless
+            savings = `Save ${formatPrice(coupon.discount)}`;
+        } else {
+            // Regular coupons: fixed discount only if there are non-silver items
+            if (hasOnlySilverItems) {
+                savings = `Not applicable (Silver items only)`;
+            } else {
+                savings = `Save ${formatPrice(coupon.discount)}`;
+                if (silverTotal > 0) {
+                    savings += ` (on non-silver items)`;
+                }
+            }
+        }
         icon = '💰';
+        
     } else if (coupon.type === 'delivery') {
         const deliveryCharge = getDeliveryCharge();
         const actualSavings = Math.min(deliveryCharge, coupon.maxDiscount || coupon.discount);
         savings = `Save ${formatPrice(actualSavings)} on delivery`;
         icon = '🚚';
     } else if (coupon.type === 'gift') {
+        // Gift coupons: Always applicable regardless of silver items
         savings = `Get ${coupon.gift} FREE`;
         icon = '🎁';
     }
@@ -711,7 +897,6 @@ function createCouponCard(coupon, isMobile = false) {
         </div>
     `;
 }
-
 // ===== PROCEED TO CHECKOUT WITH VALIDATION =====
 function proceedToCheckout() {
     if (cart.length === 0) {
@@ -788,7 +973,7 @@ function restoreCartState() {
             // Setup delivery options based on stored data
             if (currentDeliveryArea === 'jodhpur') {
                 setupDeliveryOptionsJodhpur();
-                showPincodeMessage(`✅ Delivery within Jodhpur - ₹20`, 'success');
+                showPincodeMessage(`✅ Order within Jodhpur - Choose delivery option`, 'info');
             } else if (currentDeliveryArea === 'outside') {
                 setupDeliveryOptionsOutside();
                 showPincodeMessage(`📦 Delivery outside Jodhpur - Choose delivery option`, 'info');
@@ -840,6 +1025,12 @@ function applyCouponLogic(code, messageCallback) {
         return;
     }
     
+    // Check date availability
+    if (!isCouponAvailableByDate(code)) {
+        messageCallback('This coupon is not yet available. Available from 21st July 2025.', 'error');
+        return;
+    }
+    
     // Check delivery area requirement
     if (coupon.deliveryArea && coupon.deliveryArea !== currentDeliveryArea) {
         const areaName = coupon.deliveryArea === 'jodhpur' ? 'within Jodhpur' : 'outside Jodhpur';
@@ -860,28 +1051,49 @@ function applyCouponLogic(code, messageCallback) {
         minOrder: coupon.minOrder,
         deliveryArea: coupon.deliveryArea,
         maxDiscount: coupon.maxDiscount,
-        gift: coupon.gift
+        gift: coupon.gift,
+        hidden: coupon.hidden
     };
-    if (coupon.hidden) {
-    alert('🕵️ This is a private coupon. Discount will be reviewed manually and may not apply.');
     
-}
+    if (coupon.hidden) {
+        alert('🕵️ This is a private coupon. Special terms: 5% discount on Silver Rakhis, full discount on others.');
+    }
     
     // Calculate current discount for display message
     let messageText = '';
+    const silverTotal = calculateSilverRakhiTotal();
+    const nonSilverTotal = calculateNonSilverRakhiTotal();
+    const hasSilverItems = silverTotal > 0;
+    const hasNonSilverItems = nonSilverTotal > 0;
+    const allItemsAreSilver = hasSilverItems && !hasNonSilverItems;
+    
     if (coupon.type === 'percentage') {
         const currentDiscount = calculateCurrentDiscount();
-        messageText = `🎉 Coupon applied! You saved ${formatPrice(currentDiscount)} `;
-        if (coupon.hidden) {
-            messageText = `🔖Coupon applied! ${coupon.description}: ${formatPrice(currentDiscount)}.`, 'info';
+        messageText = `🎉 Coupon applied! You saved ${formatPrice(currentDiscount)}`;
+        
+        if (allItemsAreSilver && !coupon.hidden) {
+            messageText = `⚠️ Coupon applied but no discount: Cart contains only Silver Rakhis`;
+        } else if (hasSilverItems && !coupon.hidden) {
+            messageText += ` (Note: Discount not applicable on Silver Rakhis)`;
+        } else if (hasSilverItems && coupon.hidden) {
+            messageText += ` (Special: 5% on Silver Rakhis, ${coupon.discount}% on others)`;
         }
+    } else if (coupon.type === 'fixed') {
+        if (allItemsAreSilver && !coupon.hidden) {
+            messageText = `⚠️ Coupon applied but no discount: Cart contains only Silver Rakhis`;
+        } else {
+            const currentDiscount = calculateCurrentDiscount();
+            messageText = `🎉 Coupon applied! You saved ${formatPrice(currentDiscount)}`;
+            if (hasSilverItems && !coupon.hidden) {
+                messageText += ` (Note: Discount not applicable on Silver Rakhis)`;
+            }
+        }
+    } else if (coupon.type === 'gift') {
+        // Gift coupons: Always applicable regardless of silver items
+        messageText = `🎁 Coupon applied! You get a FREE ${coupon.gift}`;
     } else if (coupon.type === 'delivery') {
         const currentDiscount = calculateCurrentDiscount();
-        messageText = `🚚 Coupon applied! Free delivery - You saved ${formatPrice(currentDiscount)}`;
-    }else if (coupon.type === 'fixed') {
-        messageText = `🎉 Coupon applied! You saved ${formatPrice(coupon.discount)}`;
-    } else if (coupon.type === 'gift') {
-        messageText = `🎁 Coupon applied! You get a FREE ${coupon.gift}`;
+        messageText = `🚚 Coupon applied! Discount on delivery - You saved ${formatPrice(currentDiscount)}`;
     }
     
     // Save coupon data to localStorage for checkout
@@ -891,7 +1103,7 @@ function applyCouponLogic(code, messageCallback) {
     updateCartSummary();
     displayEligibleCoupons(); // Refresh available coupons
     
-    console.log('Applied coupon with dynamic calculation:', appliedCouponData);
+    console.log('Applied coupon with silver restrictions:', appliedCouponData);
 }
 
 // ===== QUICK APPLY COUPON =====
