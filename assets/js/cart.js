@@ -48,38 +48,49 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 400, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 15% off for orders within Jodhpur',
-        maxDiscount: 5000,
-        expiryDate: '2025-07-20'
+        description: 'FLAT 2% on Silver Rakhis & 15% off for orders within Jodhpur',
+        expiryDate: '2025-07-20',
+        silverDiscount: 2
     },
     'EARLYBIRD': { 
         discount: 10, 
         type: 'percentage', 
         minOrder: 500, 
         deliveryArea: 'outside',
-        description: 'FLAT 10% off for delivery outside Jodhpur',
-        maxDiscount: 5000,
-        expiryDate: '2025-07-20'
+        description: 'FLAT 2% on Silver Rakhis & 10% off for delivery outside Jodhpur',
+        expiryDate: '2025-07-20',
+        silverDiscount: 2
     },
-    'FESTIVAL9': { 
-        discount: 7.5, 
+    'BIGORDER8': { 
+        discount: 8, 
         type: 'percentage', 
-        minOrder: 1500, 
-        description: '7.5% off (upto ₹135) on orders above ₹1500',
-        maxDiscount: 135
+        minOrder: 2000, 
+        description: '10% off (upto ₹275) on orders above ₹2000',
+        maxDiscount: 275
     },
-    'BIGORDER200': { 
-        discount: 200, 
+    'FESTIVAL135': { 
+        discount: 135, 
         type: 'fixed', 
-        minOrder: 2000,
-        description: 'Flat ₹200 off on orders above ₹2000'
+        minOrder: 1500,
+        description: 'FLAT ₹135 off on orders above ₹1500'
     },
     'BULKCART': { 
+        discount: 12.5, 
+        type: 'percentage', 
+        minOrder: 3100, 
+        deliveryArea: 'jodhpur',
+        description: 'FLAT 3% on Silver Rakhis & 12.5% off on orders above ₹3100  (upto ₹700)',
+        maxDiscount: 700,
+        silverDiscount: 3
+    },
+    'MEGACART': { 
         discount: 10, 
         type: 'percentage', 
         minOrder: 3100, 
-        description: '10% off (upto ₹450) on orders above ₹3100',
-        maxDiscount: 450
+        deliveryArea: 'outside',
+        description: 'FLAT 2.5% on Silver Rakhis & 10% off on orders above ₹3100 (upto ₹625)',
+        maxDiscount: 625,
+        silverDiscount: 2.5
     },
     'FREEGIFT': { 
         discount: 0, 
@@ -530,7 +541,12 @@ function calculateCurrentDiscount() {
             const silverDiscount = Math.round((silverTotal * 5) / 100);
             const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
             discount = silverDiscount + nonSilverDiscount;
-        } else {
+        } else if (appliedCouponData.silverDiscount) {
+        const silverDiscount = Math.round((silverTotal * appliedCouponData.silverDiscount) / 100);
+        const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+        discount = silverDiscount + nonSilverDiscount;
+    }
+        else {
             // Regular coupons: discount only on non-silver items
             discount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
         }
@@ -817,40 +833,53 @@ function createCouponCard(coupon, isMobile = false) {
     const hasOnlySilverItems = silverTotal > 0 && nonSilverTotal === 0;
     
     if (coupon.type === 'percentage') {
-        let actualDiscount = 0;
+    let actualDiscount = 0;
+    
+    if (coupon.hidden) {
+        // Hidden coupons: 5% on silver + full % on non-silver
+        const silverDiscount = Math.round((silverTotal * 5) / 100);
+        const nonSilverDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
+        actualDiscount = silverDiscount + nonSilverDiscount;
         
-        if (coupon.hidden) {
-            // Hidden coupons: 5% on silver + full % on non-silver
-            const silverDiscount = Math.round((silverTotal * 5) / 100);
-            const nonSilverDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
-            actualDiscount = silverDiscount + nonSilverDiscount;
-            
+        if (coupon.maxDiscount) {
+            actualDiscount = Math.min(actualDiscount, coupon.maxDiscount);
+        }
+        
+        savings = `Save ${formatPrice(actualDiscount)}`;
+        if (silverTotal > 0) {
+            savings += ` (Special: 5% on silver, ${coupon.discount}% on others)`;
+        }
+    } else if (coupon.silverDiscount) {
+        // NEW: Coupons with custom silver discount
+        const silverDiscount = Math.round((silverTotal * coupon.silverDiscount) / 100);
+        const nonSilverDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
+        actualDiscount = silverDiscount + nonSilverDiscount;
+        
+        if (coupon.maxDiscount) {
+            actualDiscount = Math.min(actualDiscount, coupon.maxDiscount);
+        }
+        
+        savings = `Save ${formatPrice(actualDiscount)}`;
+        if (silverTotal > 0) {
+            savings += ` (Special: ${coupon.silverDiscount}% on silver, ${coupon.discount}% on others)`;
+        }
+    } else {
+        // Regular coupons: discount only on non-silver items
+        if (hasOnlySilverItems) {
+            savings = `Not applicable (Silver items only)`;
+        } else {
+            actualDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
             if (coupon.maxDiscount) {
                 actualDiscount = Math.min(actualDiscount, coupon.maxDiscount);
             }
-            
             savings = `Save ${formatPrice(actualDiscount)}`;
             if (silverTotal > 0) {
-                savings += ` (Special: 5% on silver, ${coupon.discount}% on others)`;
-            }
-        } else {
-            // Regular coupons: discount only on non-silver items
-            if (hasOnlySilverItems) {
-                savings = `Not applicable (Silver items only)`;
-            } else {
-                actualDiscount = Math.round((nonSilverTotal * coupon.discount) / 100);
-                if (coupon.maxDiscount) {
-                    actualDiscount = Math.min(actualDiscount, coupon.maxDiscount);
-                }
-                savings = `Save ${formatPrice(actualDiscount)}`;
-                if (silverTotal > 0) {
-                    savings += ` (on non-silver items only)`;
-                }
+                savings += ` (on non-silver items only)`;
             }
         }
-        icon = '🏷️';
-        
-    } else if (coupon.type === 'fixed') {
+    }
+    icon = '🏷️';
+}else if (coupon.type === 'fixed') {
         if (coupon.hidden) {
             // Hidden coupons: full fixed discount regardless
             savings = `Save ${formatPrice(coupon.discount)}`;
@@ -1076,17 +1105,20 @@ function applyCouponLogic(code, messageCallback) {
     const allItemsAreSilver = hasSilverItems && !hasNonSilverItems;
     
     if (coupon.type === 'percentage') {
-        const currentDiscount = calculateCurrentDiscount();
-        messageText = `🎉 Coupon applied! You saved ${formatPrice(currentDiscount)}`;
-        
-        if (allItemsAreSilver && !coupon.hidden) {
-            messageText = `⚠️ Coupon applied but no discount: Cart contains only Silver Rakhis`;
-        } else if (hasSilverItems && !coupon.hidden) {
-            messageText += ` (Note: Discount not applicable on Silver Rakhis)`;
-        } else if (hasSilverItems && coupon.hidden) {
-            messageText += ` (Special: 5% on Silver Rakhis, ${coupon.discount}% on others)`;
-        }
-    } else if (coupon.type === 'fixed') {
+    const currentDiscount = calculateCurrentDiscount();
+    messageText = `🎉 Coupon applied! You saved ${formatPrice(currentDiscount)}`;
+    
+    if (allItemsAreSilver && !coupon.hidden && !coupon.silverDiscount) {
+        messageText = `⚠️ Coupon applied but no discount: Cart contains only Silver Rakhis`;
+    } else if (hasSilverItems && !coupon.hidden && !coupon.silverDiscount) {
+        messageText += ` (Note: Discount not applicable on Silver Rakhis)`;
+    } else if (hasSilverItems && coupon.hidden) {
+        messageText += ` (Special: 5% on Silver Rakhis, ${coupon.discount}% on others)`;
+    } else if (hasSilverItems && coupon.silverDiscount) {
+        // NEW: Custom silver discount message
+        messageText += ` (Special: ${coupon.silverDiscount}% on Silver Rakhis, ${coupon.discount}% on others)`;
+    }
+} else if (coupon.type === 'fixed') {
         if (allItemsAreSilver && !coupon.hidden) {
             messageText = `⚠️ Coupon applied but no discount: Cart contains only Silver Rakhis`;
         } else {
