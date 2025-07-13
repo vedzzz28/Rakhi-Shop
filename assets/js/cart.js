@@ -1089,7 +1089,8 @@ function applyCouponLogic(code, messageCallback) {
         deliveryArea: coupon.deliveryArea,
         maxDiscount: coupon.maxDiscount,
         gift: coupon.gift,
-        hidden: coupon.hidden
+        hidden: coupon.hidden,
+        silverDiscount: coupon.silverDiscount
     };
     
     if (coupon.hidden) {
