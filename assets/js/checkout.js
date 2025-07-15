@@ -328,7 +328,8 @@ function loadOrderItems() {
     `).join('');
 }
 
-// ===== UPDATE ORDER SUMMARY =====
+
+// ===== FIXED UPDATE ORDER SUMMARY =====
 function updateOrderSummary() {
     const subtotal = checkoutCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     let deliveryCharge = deliveryData ? deliveryData.charge : 0;
@@ -344,6 +345,11 @@ function updateOrderSummary() {
                 if (appliedCouponData.hidden) {
                     // Hidden coupons: 5% on silver, full discount on non-silver
                     const silverDiscount = Math.round((silverTotal * 5) / 100);
+                    const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+                    currentDiscount = silverDiscount + nonSilverDiscount;
+                } else if (appliedCouponData.silverDiscount) {
+                    // FIXED: Added missing silverDiscount logic
+                    const silverDiscount = Math.round((silverTotal * appliedCouponData.silverDiscount) / 100);
                     const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
                     currentDiscount = silverDiscount + nonSilverDiscount;
                 } else {
@@ -377,38 +383,29 @@ function updateOrderSummary() {
     
     const total = subtotal + deliveryCharge - currentDiscount;
     
+    // Update UI elements
     const orderSubtotal = document.getElementById('orderSubtotal');
     const orderDelivery = document.getElementById('orderDelivery');
-    const orderDiscount = document.getElementById('orderDiscount');
     const orderTotal = document.getElementById('orderTotal');
     const discountRow = document.getElementById('discountRow');
-
+    const orderDiscount = document.getElementById('orderDiscount');
+    
     if (orderSubtotal) orderSubtotal.textContent = formatPrice(subtotal);
-    if (orderDelivery) {
-        let deliveryText = formatPrice(deliveryCharge);
-        if (deliveryData) {
-            if (deliveryData.option === 'outside-normal') {
-                deliveryText += ' (Normal)';
-            } else if (deliveryData.option === 'outside-fasttrack') {
-                deliveryText += ' (Fast Track)';
-            }
-        }
-        orderDelivery.textContent = deliveryText;
-    }
-
+    if (orderDelivery) orderDelivery.textContent = formatPrice(deliveryCharge);
+    
+    // Show/hide discount row with proper silver restrictions
     if (discountRow) {
-        if (appliedCouponData) {
+        if (appliedCouponData && currentDiscount > 0) {
             const silverTotal = calculateSilverRakhiTotal();
             const nonSilverTotal = calculateNonSilverRakhiTotal();
             
-            // Check if coupon is effective
             let shouldShowDiscount = false;
             let discountText = '';
             
             if (appliedCouponData.type === 'percentage' || appliedCouponData.type === 'delivery') {
                 shouldShowDiscount = currentDiscount > 0;
                 if (appliedCouponData.type === 'delivery') {
-                    discountText = `FREE DELIVERY: -${formatPrice(currentDiscount)}`;
+                    discountText = `ON DELIVERY: -${formatPrice(currentDiscount)}`;
                 } else {
                     discountText = `-${formatPrice(currentDiscount)}`;
                 }
@@ -417,6 +414,7 @@ function updateOrderSummary() {
                     shouldShowDiscount = true;
                     discountText = `-${formatPrice(currentDiscount)}`;
                 } else {
+                    // Regular fixed coupons: only show if there are non-silver items
                     shouldShowDiscount = nonSilverTotal > 0;
                     if (shouldShowDiscount) {
                         discountText = `-${formatPrice(currentDiscount)}`;
@@ -723,7 +721,7 @@ async function handleFormSubmit(event) {
     }
 }
 
-// ===== COLLECT ORDER DATA =====
+// ===== FIXED COLLECT ORDER DATA =====
 function collectOrderData() {
     const form = document.getElementById('checkoutForm');
     const formData = new FormData(form);
@@ -734,13 +732,38 @@ function collectOrderData() {
     let currentDiscount = 0;
     if (appliedCouponData && subtotal >= appliedCouponData.minOrder) {
         if (!appliedCouponData.deliveryArea || appliedCouponData.deliveryArea === deliveryData?.area) {
+            const silverTotal = calculateSilverRakhiTotal();
+            const nonSilverTotal = calculateNonSilverRakhiTotal();
+            
             if (appliedCouponData.type === 'percentage') {
-                currentDiscount = Math.round((subtotal * appliedCouponData.discount) / 100);
+                if (appliedCouponData.hidden) {
+                    // Hidden coupons: 5% on silver, full discount on non-silver
+                    const silverDiscount = Math.round((silverTotal * 5) / 100);
+                    const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+                    currentDiscount = silverDiscount + nonSilverDiscount;
+                } else if (appliedCouponData.silverDiscount) {
+                    // FIXED: Added missing silverDiscount logic
+                    const silverDiscount = Math.round((silverTotal * appliedCouponData.silverDiscount) / 100);
+                    const nonSilverDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+                    currentDiscount = silverDiscount + nonSilverDiscount;
+                } else {
+                    // Regular coupons: discount only on non-silver items
+                    currentDiscount = Math.round((nonSilverTotal * appliedCouponData.discount) / 100);
+                }
+                
                 if (appliedCouponData.maxDiscount) {
                     currentDiscount = Math.min(currentDiscount, appliedCouponData.maxDiscount);
                 }
             } else if (appliedCouponData.type === 'fixed') {
-                currentDiscount = appliedCouponData.discount;
+                if (appliedCouponData.hidden) {
+                    currentDiscount = appliedCouponData.discount;
+                } else {
+                    if (nonSilverTotal > 0) {
+                        currentDiscount = appliedCouponData.discount;
+                    } else {
+                        currentDiscount = 0;
+                    }
+                }
             } else if (appliedCouponData.type === 'delivery') {
                 currentDiscount = Math.min(deliveryCharge, appliedCouponData.maxDiscount || appliedCouponData.discount);
             }
@@ -784,13 +807,18 @@ function collectOrderData() {
             discount: currentDiscount,
             total: total,
             method: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment (UPI)',
-            upiId: paymentMethod === 'online' ? '8949409523@pthdfc' : null
+            upiId: paymentMethod === 'online' ? formData.get('upiId') : null
         },
-        coupon: appliedCouponData,
+        appliedCoupon: appliedCouponData ? {
+            code: appliedCouponData.code,
+            type: appliedCouponData.type,
+            discount: appliedCouponData.discount,
+            actualDiscount: currentDiscount
+        } : null,
+        specialInstructions: formData.get('specialInstructions') || 'None',
         timestamp: new Date().toISOString()
     };
 }
-
 // ===== SEND ORDER EMAILS =====
 async function sendOrderEmails(orderData) {
     if (typeof emailjs === 'undefined') {
