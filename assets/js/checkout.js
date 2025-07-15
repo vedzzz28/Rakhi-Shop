@@ -790,7 +790,7 @@ function collectOrderData() {
             altPhone: formData.get('altPhone') || 'Not provided',
             address: formData.get('address'),
             city: formData.get('city'),
-            state: formData.get('state') || 'Rajasthan',
+            state: formData.get('state'),
             pincode: formData.get('pincode')
         },
         items: checkoutCart,
