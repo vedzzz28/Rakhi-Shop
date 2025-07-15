@@ -853,10 +853,11 @@ async function sendOrderEmails(orderData) {
     }
 }
 
-// ===== PREPARE OWNER EMAIL DATA WITH TABLE =====
+// ===== PREPARE OWNER EMAIL DATA =====
 function prepareOwnerEmailData(orderData) {
-    // Generate HTML table for items
-    const itemsTableHTML = generateOwnerItemsTable(orderData.items);
+    const itemsList = orderData.items.map(item => 
+        `${item.name} (${item.category}) - Qty: ${item.quantity} - ₹${item.price} each = ₹${item.price * item.quantity}`
+    ).join('\n');
 
     return {
         // Order information
@@ -867,11 +868,11 @@ function prepareOwnerEmailData(orderData) {
         customer_name: orderData.customer.name,
         customer_email: orderData.customer.email,
         customer_phone: orderData.customer.phone,
-        customer_alt_phone: orderData.customer.altPhone || 'Not provided',
+        customer_alt_phone: orderData.customer.altPhone,
         customer_full_address: `${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.state} - ${orderData.customer.pincode}`,
         
         // Items and pricing
-        items_table: itemsTableHTML,  // ✅ HTML table instead of plain text
+        items_list: itemsList,
         items_count: orderData.items.length,
         subtotal_amount: `₹${orderData.payment.subtotal}`,
         delivery_charge: `₹${orderData.payment.deliveryCharge}`,
@@ -883,14 +884,15 @@ function prepareOwnerEmailData(orderData) {
         delivery_option: orderData.delivery.optionText,
         payment_method: orderData.payment.method,
         upi_id: orderData.payment.upiId || 'Not applicable (COD)',
-        coupon_applied: orderData.coupon ? `${orderData.coupon.code} (${orderData.coupon.type === 'percentage' ? orderData.coupon.discount + '%' : '₹' + orderData.coupon.discount} off)` : 'None'
+        coupon_applied: orderData.appliedCoupon ? `${orderData.appliedCoupon.code} (${orderData.appliedCoupon.type === 'percentage' ? orderData.appliedCoupon.discount + '%' : '₹' + orderData.appliedCoupon.discount} off)` : 'None'
     };
 }
 
-// ===== PREPARE CUSTOMER EMAIL DATA WITH TABLE =====
+// ===== PREPARE CUSTOMER EMAIL DATA =====
 function prepareCustomerEmailData(orderData) {
-    // Generate HTML table for items
-    const itemsTableHTML = generateCustomerItemsTable(orderData.items);
+    const itemsList = orderData.items.map(item => 
+        `${item.name} (${item.category}) - Qty: ${item.quantity} x ₹${item.price} each = ₹${item.price * item.quantity}`
+    ).join('\n');
 
     return {
         // Required by EmailJS
@@ -901,8 +903,8 @@ function prepareCustomerEmailData(orderData) {
         order_id: orderData.orderId || 'N/A',
         order_date: orderData.orderDate || new Date().toLocaleDateString(),
 
-        // Items (✅ HTML table instead of plain text)
-        items_table: itemsTableHTML,
+        // Items
+        items_list: itemsList || 'No items found',
         items_count: orderData.items.length || 0,
         subtotal_amount: `₹${orderData.payment.subtotal || 0}`,
         delivery_charge: `₹${orderData.payment.deliveryCharge || 0}`,
@@ -923,123 +925,8 @@ function prepareCustomerEmailData(orderData) {
         shop_address: 'A-31, Umed Club Road, Raika Bagh, Jodhpur, Rajasthan',
 
         // Coupon
-        coupon_applied: orderData.coupon ? `${orderData.coupon.code} (${orderData.coupon.type === 'percentage' ? orderData.coupon.discount + '%' : '₹' + orderData.coupon.discount} off)` : 'None'
+        coupon_applied: orderData.appliedCoupon ? `${orderData.appliedCoupon.code} (${orderData.appliedCoupon.type === 'percentage' ? orderData.appliedCoupon.discount + '%' : '₹' + orderData.appliedCoupon.discount} off)` : 'None'
     };
-}
-
-// ===== GENERATE OWNER ITEMS TABLE =====
-function generateOwnerItemsTable(items) {
-    if (!items || items.length === 0) {
-        return '<p>No items found</p>';
-    }
-
-    let tableHTML = `
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif;">
-            <thead>
-                <tr style="background: #dc2626; color: white;">
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd; font-weight: bold;">#</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd; font-weight: bold;">Product Name</th>
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd; font-weight: bold;">Category</th>
-                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;">Qty</th>
-                    <th style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Unit Price</th>
-                    <th style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Total</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-    items.forEach((item, index) => {
-        const itemTotal = item.price * item.quantity;
-        const rowColor = index % 2 === 0 ? '#f8f9fa' : '#ffffff';
-        
-        tableHTML += `
-            <tr style="background: ${rowColor};">
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${index + 1}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; color: #2d3748;">${item.name}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; color: #4a5568;">
-                    <span style="background: #fed7aa; color: #92400e; padding: 3px 8px; border-radius: 12px; font-size: 12px;">
-                        ${item.category}
-                    </span>
-                </td>
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${item.quantity}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: right; color: #2d3748;">₹${item.price}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: right; font-weight: bold; color: #dc2626;">₹${itemTotal}</td>
-            </tr>`;
-    });
-
-    const grandTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    tableHTML += `
-            <tr style="background: #fef3c7; font-weight: bold;">
-                <td colspan="5" style="padding: 12px; border: 1px solid #ddd; text-align: right; color: #92400e;">
-                    <strong>Items Subtotal:</strong>
-                </td>
-                <td style="padding: 12px; border: 1px solid #ddd; text-align: right; color: #dc2626; font-size: 16px;">
-                    <strong>₹${grandTotal}</strong>
-                </td>
-            </tr>
-        </tbody>
-    </table>`;
-
-    return tableHTML;
-}
-
-// ===== GENERATE CUSTOMER ITEMS TABLE =====
-function generateCustomerItemsTable(items) {
-    if (!items || items.length === 0) {
-        return '<p>No items found</p>';
-    }
-
-    let tableHTML = `
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif;">
-            <thead>
-                <tr style="background: linear-gradient(135deg, #dc2626, #f59e0b); color: white;">
-                    <th style="padding: 12px; text-align: left; border: 1px solid #ddd; font-weight: bold;">Product</th>
-                    <th style="padding: 12px; text-align: center; border: 1px solid #ddd; font-weight: bold;">Qty</th>
-                    <th style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Price</th>
-                    <th style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">Total</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-    items.forEach((item, index) => {
-        const itemTotal = item.price * item.quantity;
-        const rowColor = index % 2 === 0 ? '#f8f9fa' : '#ffffff';
-        
-        tableHTML += `
-            <tr style="background: ${rowColor};">
-                <td style="padding: 12px; border: 1px solid #ddd;">
-                    <div style="font-weight: bold; color: #2d3748; margin-bottom: 4px;">${item.name}</div>
-                    <div style="font-size: 12px; color: #4a5568; background: #fed7aa; display: inline-block; padding: 2px 6px; border-radius: 8px;">
-                        ${item.category}
-                    </div>
-                </td>
-                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #2d3748;">
-                    ${item.quantity}
-                </td>
-                <td style="padding: 12px; border: 1px solid #ddd; text-align: right; color: #4a5568;">
-                    ₹${item.price}
-                </td>
-                <td style="padding: 12px; border: 1px solid #ddd; text-align: right; font-weight: bold; color: #dc2626;">
-                    ₹${itemTotal}
-                </td>
-            </tr>`;
-    });
-
-    const grandTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    tableHTML += `
-            <tr style="background: #fef3c7; font-weight: bold;">
-                <td colspan="3" style="padding: 12px; border: 1px solid #ddd; text-align: right; color: #92400e;">
-                    <strong>Items Subtotal:</strong>
-                </td>
-                <td style="padding: 12px; border: 1px solid #ddd; text-align: right; color: #dc2626; font-size: 16px;">
-                    <strong>₹${grandTotal}</strong>
-                </td>
-            </tr>
-        </tbody>
-    </table>`;
-
-    return tableHTML;
 }
 
 // ===== SHOW ORDER CONFIRMATION =====
