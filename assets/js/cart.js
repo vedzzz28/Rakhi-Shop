@@ -83,8 +83,8 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 5% on Silver Rakhis & 12.5% off on orders above ₹3100  (upto ₹700)',
-        maxDiscount: 700,
+        description: 'FLAT 5% on Silver Rakhis & 12.5% off on orders above ₹3100  (upto ₹625)',
+        maxDiscount: 625,
         silverDiscount: 5
     },
     'MEGACART': { 
@@ -92,8 +92,8 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'outside',
-        description: 'FLAT 5% on Silver Rakhis & 10% off on orders above ₹3100 (upto ₹625)',
-        maxDiscount: 625,
+        description: 'FLAT 5% on Silver Rakhis & 10% off on orders above ₹3100 (upto ₹550)',
+        maxDiscount: 550,
         silverDiscount: 5
     },
     'FREEGIFT': { 
@@ -132,8 +132,8 @@ const AVAILABLE_COUPONS = {
         minOrder: 500,
         silverDiscount: 2, 
         hidden: true, // Hidden from suggestions
-        description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver',
-        expiryDate: '2025-07-27T21:59:59',
+        description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver (upto ₹275)',
+        expiryDate: '2025-07-27T21:59:59'
     },
     'BULKORDER': {
         discount: 15,
@@ -142,8 +142,8 @@ const AVAILABLE_COUPONS = {
         silverDiscount: 5, 
         gift: 'a Sacred Accessory',
         hidden: true, // Hidden from suggestions
-        description: 'Premium Bulk Order: 15% OFF + 5% on silver + FREE sacred-accessory',
-        expiryDate: '2025-07-27T21:59:59',
+        description: 'Premium Bulk Order: 15% OFF + 5% on silver (upto ₹750) + FREE sacred-accessory ',
+        expiryDate: '2025-07-27T21:59:59'
     }
 };
 
