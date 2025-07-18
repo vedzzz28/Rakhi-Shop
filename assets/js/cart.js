@@ -1114,7 +1114,7 @@ function applyCouponLogic(code, messageCallback) {
     };
     
     if (coupon.hidden) {
-        alert(`🕵️ This is a private coupon. Will be Verifed Physically and may not be applicable.`);
+        alert(`🕵️ This is a private coupon. Click 'ok' to apply. The bill will be Verifed Physically and discount may not be applicable.`);
     }
     
     // Calculate current discount for display message
