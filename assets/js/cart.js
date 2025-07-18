@@ -37,8 +37,8 @@ function isCouponAvailableByDate(couponCode) {
     if (alwaysAvailable.includes(couponCode)) {
         return true;
     }
-    if (couponCode === 'EXHIBITIONSP' || couponCode === 'BULKORDER') {
-        const exhibitionStart = new Date('2025-07-26T10:00:00');
+    if (couponCode === 'ANOKHEESP' || couponCode === 'BULKORDER') {
+        const exhibitionStart = new Date('2025-07-16T10:00:00');
         return currentDate >= exhibitionStart;
     }
     
@@ -66,7 +66,7 @@ const AVAILABLE_COUPONS = {
         silverDiscount: 2
     },
     'BIGORDER8': { 
-        discount: 8, 
+        discount: 10, 
         type: 'percentage', 
         minOrder: 2000, 
         description: '10% off (upto ₹275) on orders above ₹2000',
@@ -83,18 +83,18 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 3% on Silver Rakhis & 12.5% off on orders above ₹3100  (upto ₹700)',
+        description: 'FLAT 5% on Silver Rakhis & 12.5% off on orders above ₹3100  (upto ₹700)',
         maxDiscount: 700,
-        silverDiscount: 3
+        silverDiscount: 5
     },
     'MEGACART': { 
         discount: 10, 
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'outside',
-        description: 'FLAT 2.5% on Silver Rakhis & 10% off on orders above ₹3100 (upto ₹625)',
+        description: 'FLAT 5% on Silver Rakhis & 10% off on orders above ₹3100 (upto ₹625)',
         maxDiscount: 625,
-        silverDiscount: 2.5
+        silverDiscount: 5
     },
     'FREEGIFT': { 
         discount: 0, 
@@ -106,8 +106,8 @@ const AVAILABLE_COUPONS = {
     'SHIPFREE35': {
         discount: 80,
         type: 'delivery',
-        minOrder: 700,
-        description: 'Discount on Delivery (upto ₹35) on orders above ₹700',
+        minOrder: 600,
+        description: 'Discount on Delivery (upto ₹35) on orders above ₹600',
         maxDiscount: 35
     },
     'RATHI20': {
@@ -121,28 +121,28 @@ const AVAILABLE_COUPONS = {
     'VEDZZSP10': {
         discount: 25,
         type: 'percentage',
-        minOrder: 1400,
+        minOrder: 2100,
         hidden: true,
         silverDiscount: 7,
-        description: 'FLAT 25% off on order above 1400 (Super Exclusive)'
+        description: 'FLAT 25% off on order above 2100 (Super Exclusive)'
     },
-    'EXHIBITIONSP': {
-        discount: 12,
+    'ANOKHEESP': {
+        discount: 10,
         type: 'percentage',
         minOrder: 500,
-        silverDiscount: 0, // 0% on silver rakhis (original price)
+        silverDiscount: 2, 
         hidden: true, // Hidden from suggestions
-        description: 'Exhibition Special: 12% OFF on non-silver items',
+        description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver',
         expiryDate: '2025-07-27T21:59:59',
     },
     'BULKORDER': {
         discount: 15,
         type: 'percentage', 
         minOrder: 3100,
-        silverDiscount: 3, // 3% on silver rakhis
-        gift: 'sacred-accessories',
+        silverDiscount: 5, 
+        gift: 'a Sacred Accessory',
         hidden: true, // Hidden from suggestions
-        description: 'Premium Bulk Order: 15% OFF + 3% on silver + FREE sacred-accessory',
+        description: 'Premium Bulk Order: 15% OFF + 5% on silver + FREE sacred-accessory',
         expiryDate: '2025-07-27T21:59:59',
     }
 };
