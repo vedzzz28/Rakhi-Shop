@@ -115,7 +115,7 @@ const AVAILABLE_COUPONS = {
         type: 'percentage',
         minOrder: 400,
         hidden: true,
-        silverDiscount: 5,
+        silverDiscount: 8,
         description: 'FLAT 20% off on orders above 400(Exclusive)'
     },
     'VEDZZSP10': {
@@ -123,7 +123,7 @@ const AVAILABLE_COUPONS = {
         type: 'percentage',
         minOrder: 1400,
         hidden: true,
-        silverDiscount: 5,
+        silverDiscount: 8,
         description: 'FLAT 25% off on order above 1400 (Super Exclusive)'
     },
     'EXHIBITIONSP': {
