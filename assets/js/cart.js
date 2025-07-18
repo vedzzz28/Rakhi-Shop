@@ -38,9 +38,8 @@ function isCouponAvailableByDate(couponCode) {
         return true;
     }
     if (couponCode === 'EXHIBITIONSP' || couponCode === 'BULKORDER') {
-        const exhibitionStart = new Date('2025-07-17T00:00:00');
-        const exhibitionEnd = new Date('2025-07-27T23:59:59');
-        return currentDate >= exhibitionStart && currentDate <= exhibitionEnd;
+        const exhibitionStart = new Date('2025-07-26T10:00:00');
+        return currentDate >= exhibitionStart;
     }
     
     // Other coupons available from 21-7-2025
@@ -54,7 +53,7 @@ const AVAILABLE_COUPONS = {
         minOrder: 400, 
         deliveryArea: 'jodhpur',
         description: 'FLAT 2% on Silver Rakhis & 15% off for orders within Jodhpur',
-        expiryDate: '2025-07-20',
+        expiryDate: '2025-07-20T23:59:59',
         silverDiscount: 2
     },
     'EARLYBIRD': { 
@@ -63,7 +62,7 @@ const AVAILABLE_COUPONS = {
         minOrder: 500, 
         deliveryArea: 'outside',
         description: 'FLAT 2% on Silver Rakhis & 10% off for delivery outside Jodhpur',
-        expiryDate: '2025-07-20',
+        expiryDate: '2025-07-20T23:59:59',
         silverDiscount: 2
     },
     'BIGORDER8': { 
@@ -133,16 +132,18 @@ const AVAILABLE_COUPONS = {
         minOrder: 500,
         silverDiscount: 0, // 0% on silver rakhis (original price)
         hidden: true, // Hidden from suggestions
-        description: 'Exhibition Special: 12% OFF on non-silver items'
+        description: 'Exhibition Special: 12% OFF on non-silver items',
+        expiryDate: '2025-07-27T21:59:59',
     },
     'BULKORDER': {
-        discount: 13,
+        discount: 15,
         type: 'percentage', 
         minOrder: 3100,
         silverDiscount: 3, // 3% on silver rakhis
         gift: 'sacred-accessories',
         hidden: true, // Hidden from suggestions
-        description: 'Premium Bulk Order: 13% OFF + 3% on silver + FREE sacred-accessories'
+        description: 'Premium Bulk Order: 15% OFF + 3% on silver + FREE sacred-accessory',
+        expiryDate: '2025-07-27T21:59:59',
     }
 };
 
@@ -824,7 +825,7 @@ function getEligibleCoupons(subtotal, deliveryArea) {
 
         // CHECK IF COUPON IS EXPIRED
         if (coupon.expiryDate) {
-            const expiryDate = new Date(coupon.expiryDate + 'T23:59:59');
+            const expiryDate = new Date(coupon.expiryDate);
             if (currentDate > expiryDate) {
                 return; // Skip expired coupons
             }
@@ -1080,7 +1081,7 @@ function applyCouponLogic(code, messageCallback) {
 
     if (coupon.expiryDate) {
         const currentDate = new Date();
-        const expiryDate = new Date(coupon.expiryDate + 'T23:59:59');
+        const expiryDate = new Date(coupon.expiryDate);
         if (currentDate > expiryDate) {
             messageCallback('This coupon has expired and is no longer valid.', 'error');
             return;
