@@ -115,7 +115,7 @@ const AVAILABLE_COUPONS = {
         type: 'percentage',
         minOrder: 400,
         hidden: true,
-        silverDiscount: 8,
+        silverDiscount: 5,
         description: 'FLAT 20% off on orders above 400(Exclusive)'
     },
     'VEDZZSP10': {
@@ -123,7 +123,7 @@ const AVAILABLE_COUPONS = {
         type: 'percentage',
         minOrder: 1400,
         hidden: true,
-        silverDiscount: 8,
+        silverDiscount: 7,
         description: 'FLAT 25% off on order above 1400 (Super Exclusive)'
     },
     'EXHIBITIONSP': {
@@ -1114,7 +1114,7 @@ function applyCouponLogic(code, messageCallback) {
     };
     
     if (coupon.hidden) {
-        alert(`🕵️ This is a private coupon. Click 'ok' to apply. The bill will be Verifed Physically and discount may not be applicable.`);
+        alert(`🕵️ This is a private coupon. ${coupon.silverDiscount}% on Silver Rakhis, ${coupon.discount}% on others. The bill will be Verifed Physically and discount may not be applicable. Click 'ok' to apply.`);
     }
     
     // Calculate current discount for display message
@@ -1134,7 +1134,7 @@ function applyCouponLogic(code, messageCallback) {
     } else if (hasSilverItems && !coupon.hidden && !coupon.silverDiscount) {
         messageText += ` (Note: Discount not applicable on Silver Rakhis)`;
     } else if (hasSilverItems && coupon.hidden) {
-        messageText += ` (Special: ${coupon.silverDiscount}% on Silver Rakhis, ${coupon.discount}% on others)`;
+        messageText += ` (Exclusive: ${coupon.silverDiscount}% on Silver Rakhis, ${coupon.discount}% on others)`;
     } else if (hasSilverItems && coupon.silverDiscount) {
         // NEW: Custom silver discount message
         messageText += ` (Special: ${coupon.silverDiscount}% on Silver Rakhis, ${coupon.discount}% on others)`;
