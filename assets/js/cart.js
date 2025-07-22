@@ -134,6 +134,7 @@ const AVAILABLE_COUPONS = {
         silverDiscount: 2.5, 
         hidden: true, // Hidden from suggestions
         description: 'Exhibition Special: 10% OFF on non-silver items + 2.5% OFF on Silver',
+        maxDiscount: 280,
         expiryDate: '2025-07-27T21:29:59'
     },
     'BULKORDER': {
