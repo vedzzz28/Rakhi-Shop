@@ -130,7 +130,7 @@ const AVAILABLE_COUPONS = {
     'ANOKHEESP': {
         discount: 10,
         type: 'percentage',
-        minOrder: 500,
+        minOrder: 300,
         silverDiscount: 2, 
         hidden: true, // Hidden from suggestions
         description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver',
