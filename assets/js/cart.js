@@ -131,9 +131,9 @@ const AVAILABLE_COUPONS = {
         discount: 10,
         type: 'percentage',
         minOrder: 300,
-        silverDiscount: 2, 
+        silverDiscount: 2.5, 
         hidden: true, // Hidden from suggestions
-        description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver',
+        description: 'Exhibition Special: 10% OFF on non-silver items + 2.5% OFF on Silver',
         expiryDate: '2025-07-27T21:29:59'
     },
     'BULKORDER': {
@@ -143,7 +143,7 @@ const AVAILABLE_COUPONS = {
         silverDiscount: 5, 
         gift: 'a Sacred Accessory',
         hidden: true, // Hidden from suggestions
-        description: 'Premium Bulk Order: 15% OFF + 5% on silver (upto ₹750) + FREE sacred-accessory ',
+        description: 'Exhibition Bulk Order: 15% OFF + 5% on silver (upto ₹750) + FREE sacred-accessory ',
         maxDiscount: 750,
         expiryDate: '2025-07-27T21:29:59'
     }
