@@ -38,7 +38,7 @@ function isCouponAvailableByDate(couponCode) {
         return true;
     }
     if (couponCode === 'ANOKHEESP' || couponCode === 'BULKORDER') {
-        const exhibitionStart = new Date('2025-07-16T10:00:00');
+        const exhibitionStart = new Date('2025-07-26T10:00:00');
         return currentDate >= exhibitionStart;
     }
     
@@ -69,8 +69,9 @@ const AVAILABLE_COUPONS = {
         discount: 10, 
         type: 'percentage', 
         minOrder: 2000, 
-        description: '10% off (upto ₹275) on orders above ₹2000',
-        maxDiscount: 275
+        description: 'FLAT 3% OFF on Silver Rakhis & 10% off (upto ₹275) on others on orders above ₹2000',
+        maxDiscount: 275,
+        silverDiscount: 3
     },
     'FESTIVAL135': { 
         discount: 135, 
@@ -83,7 +84,7 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 5% on Silver Rakhis & 12.5% off on orders above ₹3100  (upto ₹625)',
+        description: 'FLAT 5% on Silver Rakhis & 12.5% off on others on orders above ₹3100  (upto ₹625)',
         maxDiscount: 625,
         silverDiscount: 5
     },
@@ -92,7 +93,7 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'outside',
-        description: 'FLAT 5% on Silver Rakhis & 10% off on orders above ₹3100 (upto ₹550)',
+        description: 'FLAT 5% on Silver Rakhis & 10% off on others on orders above ₹3100 (upto ₹550)',
         maxDiscount: 550,
         silverDiscount: 5
     },
@@ -132,8 +133,8 @@ const AVAILABLE_COUPONS = {
         minOrder: 500,
         silverDiscount: 2, 
         hidden: true, // Hidden from suggestions
-        description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver (upto ₹275)',
-        expiryDate: '2025-07-27T21:59:59'
+        description: 'Exhibition Special: 10% OFF on non-silver items + 2% on Silver',
+        expiryDate: '2025-07-27T21:29:59'
     },
     'BULKORDER': {
         discount: 15,
@@ -143,7 +144,8 @@ const AVAILABLE_COUPONS = {
         gift: 'a Sacred Accessory',
         hidden: true, // Hidden from suggestions
         description: 'Premium Bulk Order: 15% OFF + 5% on silver (upto ₹750) + FREE sacred-accessory ',
-        expiryDate: '2025-07-27T21:59:59'
+        maxDiscount: 750,
+        expiryDate: '2025-07-27T21:29:59'
     }
 };
 
