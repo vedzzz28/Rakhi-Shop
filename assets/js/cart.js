@@ -84,18 +84,18 @@ const AVAILABLE_COUPONS = {
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'jodhpur',
-        description: 'FLAT 5% on Silver Rakhis & 12.5% off on others on orders above ₹3100  (upto ₹625)',
+        description: 'FLAT 4% on Silver Rakhis & 12.5% off on others on orders above ₹3100  (upto ₹625)',
         maxDiscount: 625,
-        silverDiscount: 5
+        silverDiscount: 4
     },
     'MEGACART': { 
         discount: 10, 
         type: 'percentage', 
         minOrder: 3100, 
         deliveryArea: 'outside',
-        description: 'FLAT 5% on Silver Rakhis & 10% off on others on orders above ₹3100 (upto ₹550)',
+        description: 'FLAT 4% on Silver Rakhis & 10% off on others on orders above ₹3100 (upto ₹550)',
         maxDiscount: 550,
-        silverDiscount: 5
+        silverDiscount: 4
     },
     'FREEGIFT': { 
         discount: 0, 
@@ -116,16 +116,16 @@ const AVAILABLE_COUPONS = {
         type: 'percentage',
         minOrder: 400,
         hidden: true,
-        silverDiscount: 5,
+        silverDiscount: 4,
         description: 'FLAT 20% off on orders above 400(Exclusive)'
     },
     'VEDZZSP10': {
         discount: 25,
         type: 'percentage',
-        minOrder: 2100,
+        minOrder: 1600,
         hidden: true,
-        silverDiscount: 7,
-        description: 'FLAT 25% off on order above 2100 (Super Exclusive)'
+        silverDiscount: 6,
+        description: 'FLAT 25% off on order above 1600 (Super Exclusive)'
     },
     'ANOKHEESP': {
         discount: 10,
