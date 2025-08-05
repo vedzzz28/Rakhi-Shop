@@ -2,7 +2,7 @@ ID,Name,Price,Image,Category,Stock
 rakhi-001,Stone Bracelet Pair,132,assets/images/rakhis/1.jpg,Bhaiya-Bhabhi,12
 rakhi-002,Evil Eye Pair,168,assets/images/rakhis/2.jpg,Bhaiya-Bhabhi,11
 rakhi-003,Elephant Pair,180,assets/images/rakhis/3.jpg,Bhaiya-Bhabhi,4
-rakhi-004,Patola Rakhi,54,assets/images/rakhis/4.jpg,Designer,12
+rakhi-004,Patola Rakhi,54,assets/images/rakhis/4.jpg,Designer,11
 rakhi-005,Peacock Designer Rakhi,54,assets/images/rakhis/5.jpg,Designer,6
 rakhi-006,Multicolour Stone Rakhi,48,assets/images/rakhis/6.jpg,Designer,8
 rakhi-007,Kundan Flower Designer,42,assets/images/rakhis/7.jpg,Designer,5
@@ -18,12 +18,12 @@ rakhi-016,Bracelet for Kids (Various designs Available),72,assets/images/rakhis/
 rakhi-017,Stone BRO Designer,54,assets/images/rakhis/17.jpg,Designer,1
 rakhi-018,Colourful Stone Pair,156,assets/images/rakhis/18.jpg,Bhaiya-Bhabhi,11
 rakhi-019,Evil Eye Blue Thread Bracelet Pair,145,assets/images/rakhis/19.jpg,Bhaiya-Bhabhi,0
-rakhi-020,Green Buti Pair,180,assets/images/rakhis/20.jpg,Bhaiya-Bhabhi,4
+rakhi-020,Green Buti Pair,180,assets/images/rakhis/20.jpg,Bhaiya-Bhabhi,3
 rakhi-021,Single Evil Eye Blue Thread Bracelet Pair,135,assets/images/rakhis/21.jpg,Bhaiya-Bhabhi,0
-rakhi-022,Mina Pair Rakhi,150,assets/images/rakhis/22.jpg,Bhaiya-Bhabhi,11
+rakhi-022,Mina Pair Rakhi,150,assets/images/rakhis/22.jpg,Bhaiya-Bhabhi,3
 rakhi-023,Multicolour Evil Eye Pair,150,assets/images/rakhis/23.jpg,Bhaiya-Bhabhi,0
 rakhi-024,Kundan Stone Jodi (Pair),54,assets/images/rakhis/24.jpg,Bhaiya-Bhabhi,1
-rakhi-025,MangalSutra-Thread Jodi (Pair),240,assets/images/rakhis/25.jpg,Bhaiya-Bhabhi,1
+rakhi-025,MangalSutra Bracelet,150,assets/images/rakhis/25.jpg,Lumba,1
 rakhi-026,Rudraksh Pair,24,assets/images/rakhis/26.jpg,Bhaiya-Bhabhi,14
 rakhi-027,Yellow Flower Pair,30,assets/images/rakhis/27.jpg,Bhaiya-Bhabhi,0
 rakhi-028,Mini Rakhi Pair,24,assets/images/rakhis/28.jpg,Bhaiya-Bhabhi,3
@@ -43,18 +43,18 @@ rakhi-041,AD Stone Rakhi,72,assets/images/rakhis/41.jpg,Designer,4
 rakhi-042,Damru Rakhi,72,assets/images/rakhis/42.jpg,Designer,0
 rakhi-043,Kanha Rakhi,72,assets/images/rakhis/43.jpg,Designer,0
 rakhi-044,Pink/Blue Kundan Rakhi,54,assets/images/rakhis/44.jpg,Designer,0
-rakhi-045,Blue Zardozi Rakhi,78,assets/images/rakhis/45.jpg,Designer,8
-rakhi-046,Colored Stone Rakhi,54,assets/images/rakhis/46.jpg,Designer,1
+rakhi-045,Blue Zardozi Rakhi,78,assets/images/rakhis/45.jpg,Designer,6
+rakhi-046,Colored Stone Rakhi,54,assets/images/rakhis/46.jpg,Designer,0
 rakhi-047,Resin Blue Rakhi,72,assets/images/rakhis/47.jpg,Designer,0
 rakhi-048,Red Mina Rakhi,72,assets/images/rakhis/48.jpg,Designer,7
 rakhi-049,Green Stone Rakhi,45,assets/images/rakhis/49.jpg,Designer,0
 rakhi-050,Radha-Krishna Rakhi,30,assets/images/rakhis/50.jpg,Designer,3
 rakhi-051,Blue Mina Rakhi,72,assets/images/rakhis/51.jpg,Designer,3
 rakhi-052,Rudraksh Ganpati Rakhi,30,assets/images/rakhis/52.jpg,Designer,1
-rakhi-053,Green Stone Designer,85,assets/images/rakhis/53.jpg,Designer,1
+rakhi-053,Green Stone Designer,85,assets/images/rakhis/53.jpg,Designer,0
 rakhi-054,Mina Stone Rakhi,72,assets/images/rakhis/54.jpg,Designer,3
-rakhi-055,Multicolor Mina Rakhi,72,assets/images/rakhis/55.jpg,Designer,2
-rakhi-056,Mauli Chandan Rakhi,42,assets/images/rakhis/56.jpg,Designer,9
+rakhi-055,Multicolor Mina Rakhi,72,assets/images/rakhis/55.jpg,Designer,0
+rakhi-056,Mauli Chandan Rakhi,42,assets/images/rakhis/56.jpg,Designer,1
 rakhi-057,Pink Feather Rakhi,25,assets/images/rakhis/57.jpg,Designer,7
 rakhi-058,Rose Stone Rakhi,25,assets/images/rakhis/58.jpg,Designer,2
 rakhi-059,Big Kundan Rakhi,35,assets/images/rakhis/59.jpg,Designer,1
@@ -79,7 +79,7 @@ rakhi-077,Colourful Special Stones,25,assets/images/rakhis/77.jpg,Designer,0
 rakhi-078,Simple Stone Rakhi,18,assets/images/rakhis/78.jpg,Designer,0
 rakhi-079,Kundan Yelow/Green Thread Single,15,assets/images/rakhis/79.jpg,Designer,0
 rakhi-080,Stone Flower Designer,24,assets/images/rakhis/80.jpg,Designer,0
-rakhi-081,Orange Feather Rakhi,20,assets/images/rakhis/81.jpg,Designer,6
+rakhi-081,Orange Feather Rakhi,30,assets/images/rakhis/81.jpg,Designer,3
 rakhi-082,Silver A.D. Rakhi,240,assets/images/rakhis/82.jpg,Designer,1
 rakhi-083,Boutique Exclusive Rudraksh,150,assets/images/rakhis/83.jpg,Designer,0
 rakhi-084,Boutique Exclusive Om ,190,assets/images/rakhis/84.jpg,Designer,0
@@ -102,7 +102,7 @@ rakhi-100,Silver Flowers Red-Yellow Thread,110,assets/images/rakhis/100.jpg,Desi
 rakhi-101,Silver Flowers Red Thread,110,assets/images/rakhis/101.jpg,Designer,0
 rakhi-102,Colourful single stone mauli,25,assets/images/rakhis/102.jpg,Thread,13
 rakhi-103,rudraksh double thread,36,assets/images/rakhis/103.jpg,Thread,0
-rakhi-104,single stone multicolor double thread,30,assets/images/rakhis/104.jpg,Thread,36
+rakhi-104,single stone multicolor double thread,30,assets/images/rakhis/104.jpg,Thread,35
 rakhi-105,charms mauli,25,assets/images/rakhis/105.jpg,Thread,16
 rakhi-106,cubical stones mauli,18,assets/images/rakhis/106.jpg,Thread,24
 rakhi-107,moti stones mauli,18,assets/images/rakhis/107.jpg,Thread,21
@@ -117,7 +117,7 @@ rakhi-115,american stone thread,85,assets/images/rakhis/115.jpg,Thread,0
 rakhi-116,Silver Ganpati Trishul Rakhi,110,assets/images/rakhis/116.jpg,Designer,0
 rakhi-117,golden balls mauli,24,assets/images/rakhis/117.jpg,Thread,0
 rakhi-118,golden tortoise mauli,36,assets/images/rakhis/118.jpg,Thread,17
-rakhi-119,multicolor moti thread,24,assets/images/rakhis/119.jpg,Thread,25
+rakhi-119,multicolor moti thread,24,assets/images/rakhis/119.jpg,Thread,21
 rakhi-120,Pastel colour thread,24,assets/images/rakhis/120.jpg,Thread,40
 rakhi-121,Silver Gold Gota Thread,36,assets/images/rakhis/121.jpg,Thread,0
 rakhi-122,Multicolor Shining Stone double Thread,30,assets/images/rakhis/122.jpg,Thread,4
@@ -131,14 +131,14 @@ rakhi-129,Gold Pipe Mauli,18,assets/images/rakhis/129.jpg,Thread,41
 rakhi-130,Thick Mauli,18,assets/images/rakhis/130.jpg,Thread,37
 rakhi-131,Small Silver Balls Rakhi,48,assets/images/rakhis/131.jpg,Thread,0
 rakhi-132,Moti Latkan Rakhi,24,assets/images/rakhis/132.jpg,Thread,4
-rakhi-133,Tiranga Moti Rakhi,24,assets/images/rakhis/133.jpg,Thread,5
+rakhi-133,Tiranga Moti Rakhi,24,assets/images/rakhis/133.jpg,Thread,3
 rakhi-134,Exclusive Mauli (Available in various colours),24,assets/images/rakhis/134.jpg,Thread,43
 rakhi-135,white small beads thread,6,assets/images/rakhis/135.jpg,Thread,48
 rakhi-136,Colourful Charms,35,assets/images/rakhis/136.jpg,Thread,55
 rakhi-137,Fidget Spinner Rakhi,85,assets/images/rakhis/137.jpg,Kids,0
 rakhi-138,Highlighter Rakhi,85,assets/images/rakhis/138.jpg,Kids,1
-rakhi-139,Musical Theme Kids Special,180,assets/images/rakhis/139.jpg,Kids,4
-rakhi-140,Evil Eye with Peacock Rakhi,55,assets/images/rakhis/140.jpg,Kids,5
+rakhi-139,Musical Theme Kids Special,180,assets/images/rakhis/139.jpg,Kids,2
+rakhi-140,Evil Eye with Peacock Rakhi,55,assets/images/rakhis/140.jpg,Kids,3
 rakhi-141,Special Scrunchies,84,assets/images/rakhis/141.jpg,Kids,0
 rakhi-142,Light Spiderman Rakhi,70,assets/images/rakhis/142.jpg,Kids,0
 rakhi-143,Pink Candy Kids Special,60,assets/images/rakhis/143.jpg,Kids,1
@@ -146,7 +146,7 @@ rakhi-144,Colorful Thread Baby Elephant,54,assets/images/rakhis/144.jpg,Kids,0
 rakhi-145,Evil Eye Bracelet for kids,130,assets/images/rakhis/145.jpg,Kids,0
 rakhi-146,Shri Ram Bracelet,72,assets/images/rakhis/146.jpg,Kids,5
 rakhi-147,Adjustable Magnetic Bracelet,180,assets/images/rakhis/147.jpg,Designer,13
-rakhi-148,Happy Day Bracelet,120,assets/images/rakhis/148.jpg,Kids,5
+rakhi-148,Happy Day Bracelet,120,assets/images/rakhis/148.jpg,Kids,4
 rakhi-149,Superhero Band,215,assets/images/rakhis/149.jpg,Kids,0
 rakhi-150,Captain America Band,215,assets/images/rakhis/150.jpg,Kids,0
 rakhi-151,Cycler Band,215,assets/images/rakhis/151.jpg,Kids,0
@@ -182,12 +182,12 @@ rakhi-180,Cartoon Sharpener Rakhi,18,assets/images/rakhis/180.jpg,Kids,9
 rakhi-181,Bunny on Bike,25,assets/images/rakhis/181.jpg,Kids,1
 rakhi-182,Pink Resin Flower Rakhi,35,assets/images/rakhis/182.jpg,Kids,2
 rakhi-183,Sweet Bunny Kids,35,assets/images/rakhis/183.jpg,Kids,1
-rakhi-184,Kids Cute Resin ,25,assets/images/rakhis/184.jpg,Kids,11
+rakhi-184,Kids Cute Resin ,25,assets/images/rakhis/184.jpg,Kids,7
 rakhi-185,Multicolor thread kids special,12,assets/images/rakhis/185.jpg,Kids,0
 rakhi-186,Pizza Pen,24,assets/images/rakhis/186.jpg,Kids,0
 rakhi-187,Green McD Resin,25,assets/images/rakhis/187.jpg,Kids,5
-rakhi-188,Ganesha & Coke Special,24,assets/images/rakhis/188.jpg,Kids,8
-rakhi-189,2D Print Rakhi,12,assets/images/rakhis/189.jpg,Kids,8
+rakhi-188,Ganesha & Coke Special,24,assets/images/rakhis/188.jpg,Kids,6
+rakhi-189,2D Print Rakhi,17,assets/images/rakhis/189.jpg,Kids,8
 rakhi-190,Cards Print Rakhi,12,assets/images/rakhis/190.jpg,Kids,0
 rakhi-191,Maggie Pikachu Rakhi,18,assets/images/rakhis/191.jpg,Kids,9
 rakhi-192,Thin Crochet Kids Rakhi,24,assets/images/rakhis/192.jpg,Kids,0
@@ -322,14 +322,14 @@ rakhi-320,Gold Yellow Stone Pair,130,assets/images/rakhis/320.jpg,Bhaiya-Bhabhi,
 rakhi-321,Blue Evil Eye Pair,120,assets/images/rakhis/321.jpg,Bhaiya-Bhabhi,3
 rakhi-322,Ghungroo Pair,140,assets/images/rakhis/322.jpg,Bhaiya-Bhabhi,6
 rakhi-323,Neon Flower Bracelet Pair,130,assets/images/rakhis/323.jpg,Bhaiya-Bhabhi,0
-rakhi-324,Multicolor Flower with moti Pair,70,assets/images/rakhis/324.jpg,Bhaiya-Bhabhi,5
+rakhi-324,Multicolor Flower with moti Pair,70,assets/images/rakhis/324.jpg,Bhaiya-Bhabhi,2
 rakhi-325,Square Flower Kundan Pair,160,assets/images/rakhis/325.jpg,Bhaiya-Bhabhi,11
 rakhi-326,Flower Butterfly kumkum-chawal set,45,assets/images/rakhis/326.jpg,Sacred-Accessories,15
 rakhi-327,Multicolour Rectangular Pair (Available in different colours),180,assets/images/rakhis/327.jpg,Bhaiya-Bhabhi,12
-rakhi-328,Net Moti Pair (Available in different colours),130,assets/images/rakhis/328.jpg,Bhaiya-Bhabhi,5
+rakhi-328,Net Moti Pair (Available in different colours),130,assets/images/rakhis/328.jpg,Bhaiya-Bhabhi,4
 rakhi-329,Colourful Pearl Pair,110,assets/images/rakhis/329.jpg,Bhaiya-Bhabhi,0
 rakhi-330,Circular Shaped Rakhi Pair,130,assets/images/rakhis/330.jpg,Bhaiya-Bhabhi,0
-rakhi-331,Multicolour Kundan Rakhi,45,assets/images/rakhis/331.jpg,Designer,3
+rakhi-331,Multicolour Kundan Rakhi,45,assets/images/rakhis/331.jpg,Designer,1
 rakhi-332,Double Moti Circle Pair,70,assets/images/rakhis/332.jpg,Bhaiya-Bhabhi,0
 rakhi-333,Golden Blue Pair,130,assets/images/rakhis/333.jpg,Bhaiya-Bhabhi,0
 rakhi-334,Special Acrylic Puja Basket,110,assets/images/rakhis/334.jpg,Sacred-Accessories,0
@@ -356,7 +356,7 @@ rakhi-354,Mango Shaped Moti Pair,30,assets/images/rakhis/354.jpg,Bhaiya-Bhabhi,0
 rakhi-355,Mini Ball Rakhi,15,assets/images/rakhis/355.jpg,Bhaiya-Bhabhi,0
 rakhi-356,MultiStone Pair,35,assets/images/rakhis/356.jpg,Bhaiya-Bhabhi,2
 rakhi-357,Lotus Shaped Pair,35,assets/images/rakhis/357.jpg,Bhaiya-Bhabhi,0
-rakhi-358,Balls and Stone Designer (Available in Different Colours),11,assets/images/rakhis/358.jpg,Designer,8
+rakhi-358,Balls and Stone Designer (Available in Different Colours),11,assets/images/rakhis/358.jpg,Designer,7
 rakhi-359,Royal Lumba,40,assets/images/rakhis/359.jpg,Lumba,0
 rakhi-360,Yellow Simple,7,assets/images/rakhis/360.jpg,Thread,0
 rakhi-361,Mauli with beads,7,assets/images/rakhis/361.jpg,Thread,0
@@ -368,26 +368,26 @@ rakhi-366,Mini Latkan Pair,17,assets/images/rakhis/366.jpg,Bhaiya-Bhabhi,5
 rakhi-367,Heavy Diya Kunchhi Bracelet Exclusive Pair,260,assets/images/rakhis/367.jpg,Bhaiya-Bhabhi,10
 rakhi-368,Big Beads Designer Thread,12,assets/images/rakhis/368.jpg,Thread,3
 rakhi-369,Butterfly Charm Lumba,160,assets/images/rakhis/369.jpg,Lumba,5
-rakhi-370,Heavy Kunchhi Exclusive Bracelet,670,assets/images/rakhis/370.jpg,Lumba,10
+rakhi-370,Heavy Kunchhi Exclusive Bracelet,670,assets/images/rakhis/370.jpg,Lumba,5
 rakhi-371,Beads Mauli,5,assets/images/rakhis/371.jpg,Thread,0
-rakhi-372,Om Resin Art Rakhi (Yellow/Orange),80,assets/images/rakhis/372.jpg,Designer,5
-rakhi-373,Lil Bro Resin Art Rakhi,80,assets/images/rakhis/373.jpg,Designer,5
-rakhi-374,Forever Wala Saath Resin Art Rakhi,80,assets/images/rakhis/374.jpg,Designer,5
-rakhi-375,Forever Wala Saath Resin Art Latkan,115,assets/images/rakhis/375.jpg,Lumba,5
-rakhi-376,Pyaare Bhaiya Resin Art Rakhi,80,assets/images/rakhis/376.jpg,Designer,5
-rakhi-377,Resin Art Evil Eye Rakhi,100,assets/images/rakhis/377.jpg,Designer,5
-rakhi-378,Bhai Resin Art Rakhi (Purple/White),80,assets/images/rakhis/378.jpg,Designer,5
-rakhi-379,BRO#1 Resin Art Rakhi,80,assets/images/rakhis/379.jpg,Designer,5
-rakhi-380,Ganpati Resin Art Rakhi,80,assets/images/rakhis/380.jpg,Designer,5
-rakhi-381,Evil Eye Special Charm Designer,115,assets/images/rakhis/381.jpg,Designer,5
-rakhi-382,Evil Eye Special Charm Pair,150,assets/images/rakhis/382.jpg,Bhaiya-Bhabhi,5
-rakhi-383,Chota Bhai Resin Art Rakhi (White/Green),80,assets/images/rakhis/383.jpg,Designer,5
-rakhi-384,Resin Art Initial Rakhi,100,assets/images/rakhis/384.jpg,Designer,5
-rakhi-385,Resin Art 3D Initial Rakhi,100,assets/images/rakhis/385.jpg,Designer,5
-rakhi-386,Color Palette Rakhi,100,assets/images/rakhis/386.jpg,Kids,5
-rakhi-387,Resin Art Exclusive Puja Thali,670,assets/images/rakhis/387.jpg,Sacred-Accessories,5
-rakhi-388,Resin Art King Queen Pair,180,assets/images/rakhis/388.jpg,Bhaiya-Bhabhi,5
-rakhi-389,Resin Art Pyaare Bhaiya-Bhabhi Pair,180,assets/images/rakhis/389.jpg,Bhaiya-Bhabhi,5
+rakhi-372,Om Resin Art Rakhi (Yellow/Orange),80,assets/images/rakhis/372.jpg,Designer,1
+rakhi-373,Lil Bro Resin Art Rakhi,80,assets/images/rakhis/373.jpg,Designer,2
+rakhi-374,Forever Wala Saath Resin Art Rakhi,80,assets/images/rakhis/374.jpg,Designer,2
+rakhi-375,Forever Wala Saath Resin Art Latkan,115,assets/images/rakhis/375.jpg,Lumba,2
+rakhi-376,Pyaare Bhaiya Resin Art Rakhi,80,assets/images/rakhis/376.jpg,Designer,1
+rakhi-377,Resin Art Evil Eye Rakhi,100,assets/images/rakhis/377.jpg,Designer,1
+rakhi-378,Bhai Resin Art Rakhi (Purple/White),80,assets/images/rakhis/378.jpg,Designer,0
+rakhi-379,BRO#1 Resin Art Rakhi,80,assets/images/rakhis/379.jpg,Designer,1
+rakhi-380,Ganpati Resin Art Rakhi,80,assets/images/rakhis/380.jpg,Designer,1
+rakhi-381,Evil Eye Special Charm Designer,115,assets/images/rakhis/381.jpg,Designer,0
+rakhi-382,Evil Eye Special Charm Pair,150,assets/images/rakhis/382.jpg,Bhaiya-Bhabhi,0
+rakhi-383,Chota Bhai Resin Art Rakhi (Green),80,assets/images/rakhis/383.jpg,Designer,1
+rakhi-384,Resin Art Initial Rakhi (P/G/V/B/N/R/C/W),80,assets/images/rakhis/384.jpg,Designer,9
+rakhi-385,Resin Art 3D Initial Rakhi (R/N/B/P),90,assets/images/rakhis/385.jpg,Designer,4
+rakhi-386,Color Palette Rakhi,100,assets/images/rakhis/386.jpg,Kids,0
+rakhi-387,Resin Art Exclusive Puja Thali,670,assets/images/rakhis/387.jpg,Sacred-Accessories,0
+rakhi-388,Resin Art King Queen Pair,180,assets/images/rakhis/388.jpg,Bhaiya-Bhabhi,1
+rakhi-389,Resin Art Pyaare Bhaiya-Bhabhi Pair,180,assets/images/rakhis/389.jpg,Bhaiya-Bhabhi,0
 rakhi-390,Premium 92.5% Silver Multicolor Rakhi,1500,assets/images/rakhis/390.jpg,Silver,10
 rakhi-391,Exclusive 92.5% Silver Beads Multicolor Rakhi,1700,assets/images/rakhis/391.jpg,Silver,10
 rakhi-392,Exclusive 92.5% Silver Beads Red Kundan Rakhi,1700,assets/images/rakhis/392.jpg,Silver,10
@@ -396,8 +396,8 @@ rakhi-394,Exclusive 92.5% Silver Multicolor Rakhi,1700,assets/images/rakhis/394.
 rakhi-395,Exclusive 92.5% Silver Multicolor Kundan Rakhi,1300,assets/images/rakhis/395.jpg,Silver,10
 rakhi-396,Exclusive 92.5% Silver Beads Multicolor Kundan Rakhi,1500,assets/images/rakhis/396.jpg,Silver,10
 rakhi-397,Premium 92.5% Silver Multicolor Kundan Rakhi,1500,assets/images/rakhis/397.jpg,Silver,10
-rakhi-398,Colourful Thread Kundan Exclusive Pair,180,assets/images/rakhis/398.jpg,Bhaiya-Bhabhi,5
-rakhi-399,Chand Kundan Premium Bracelet (Red/Green),190,assets/images/rakhis/399.jpg,Lumba,2
+rakhi-398,Colourful Thread Kundan Exclusive Pair,180,assets/images/rakhis/398.jpg,Bhaiya-Bhabhi,2
+rakhi-399,Chand Kundan Premium Bracelet (Red),190,assets/images/rakhis/399.jpg,Lumba,2
 rakhi-400,Stone Bracelet Special (Available in 4 colours),150,assets/images/rakhis/400.jpg,Lumba,4
 rakhi-401,Trishul Bracelet (92.5% Pure Silver),800,assets/images/rakhis/401.jpg,Silver,8
 rakhi-402,Rectangle with work (92.5% Pure Silver),1000,assets/images/rakhis/402.jpg,Silver,8
